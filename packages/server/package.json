@@ -1,0 +1,26 @@
+{
+  "name": "@the-committee/server",
+  "version": "0.0.0",
+  "description": "Server component for The Committee.",
+  "author": "Joshua Driesman <jdriesman@outlook.com>",
+  "homepage": "https://github.com/JoshuaDriesman/the-committee#readme",
+  "license": "MIT",
+  "main": "lib/server.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoshuaDriesman/the-committee.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/JoshuaDriesman/the-committee/issues"
+  }
+}
