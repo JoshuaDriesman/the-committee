@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import config from './config';
-import User from './models/user';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', { useNewUrlParser: true });
 
