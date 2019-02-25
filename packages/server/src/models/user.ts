@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import config from '../config';
 
 export interface IUserModel extends mongoose.Document {
   email: string;
@@ -28,7 +27,7 @@ UserSchema.pre<IUserModel>('save', function save(next) {
     return next();
   }
   bcrypt
-    .hash(user.password, config.passwordHashing.saltRounds)
+    .hash(user.password, 10)
     .catch((err: any) => {
       return next(err);
     })
