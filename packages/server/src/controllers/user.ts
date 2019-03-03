@@ -10,7 +10,7 @@ const generateToken = (user: IUserModel): string => {
   });
 };
 
-export let register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   req.assert('email', 'Email is required').notEmpty();
   req.assert('password', 'Password is required').notEmpty();
   req.assert('firstName', 'First name is required').notEmpty();
@@ -24,9 +24,9 @@ export let register = async (req: Request, res: Response) => {
   }
 
   try {
-    const maybeUser = await User.findOne( {email: req.body.email }).exec();
+    const maybeUser = await User.findOne({ email: req.body.email }).exec();
     if (maybeUser) {
-      return res.status(400).send("User with that email already exists");
+      return res.status(400).send('User with that email already exists');
     }
   } catch (err) {
     return res.status(500).send('User could not be created');
@@ -47,7 +47,7 @@ export let register = async (req: Request, res: Response) => {
   }
 };
 
-export let login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
@@ -65,7 +65,9 @@ export let login = async (req: Request, res: Response) => {
   }
 
   if (!user) {
-    return res.status(404).send(`User with the email ${req.body.email} not found.`);
+    return res
+      .status(404)
+      .send(`User with the email ${req.body.email} not found.`);
   }
 
   let isPasswordValid: boolean;
@@ -80,4 +82,38 @@ export let login = async (req: Request, res: Response) => {
   }
 
   res.status(403).send('Incorrect password!');
+};
+
+export const getUser = async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  let user;
+  try {
+    user = await User.findById(userId, { password: 0 });
+  } catch (err) {
+    return res.status(500).send(`Could not get user with ID ${userId}`);
+  }
+
+  if (!user) {
+    return res.status(404).send(`User not found for ${userId}`);
+  }
+
+  return res.send(user);
+};
+
+export const getUserByEmail = async (req: Request, res: Response) => {
+  const email = req.params.email;
+
+  let user;
+  try {
+    user = await User.findOne({ email }, { password: 0 });
+  } catch (err) {
+    return res.status(500).send(`Could not get user with email ${email}`);
+  }
+
+  if (!user) {
+    return res.status(404).send(`User not found for ${email}`);
+  }
+
+  return res.send(user);
 };
