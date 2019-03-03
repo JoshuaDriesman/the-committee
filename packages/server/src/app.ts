@@ -7,7 +7,8 @@ import mongoose from 'mongoose';
 import serverConfig from './config/server';
 import { isAuthenticated } from './utils/user-auth';
 
-import { login, register } from './controllers/user';
+import { createRoster } from './controllers/roster';
+import { getUser, getUserByEmail, login, register } from './controllers/user';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
   useNewUrlParser: true
@@ -28,5 +29,9 @@ app.get('/', (req: Request, res: Response) => {
 
 app.post('/user/register', register);
 app.post('/user/login', login);
+app.get('/user/:userId', isAuthenticated, getUser);
+app.get('/user/byEmail/:email', isAuthenticated, getUserByEmail);
+
+app.post('/roster', isAuthenticated, createRoster);
 
 export default app;
