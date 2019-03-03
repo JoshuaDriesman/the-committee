@@ -5,6 +5,7 @@ import expressValidator from 'express-validator';
 import mongoose from 'mongoose';
 
 import serverConfig from './config/server';
+import { isAuthenticated } from './utils/user-auth';
 
 import { login, register } from './controllers/user';
 
