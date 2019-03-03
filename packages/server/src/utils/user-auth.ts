@@ -31,11 +31,13 @@ export let getUserFromJWT = async (jwtString: string): Promise<IUserModel> => {
  * Does not check authorization.
  */
 export let isAuthenticated = async (req: Request, res: Response, next: () => void ): Promise<void> => {
-  const token: string = (req.headers.authorization as string).substring(7);
-  if (!token) {
+  const authHeader: string = req.headers.authorization as string;
+  if (!authHeader) {
     res.status(403).send('You must be authenticated to access this resource.');
     return;
   }
+
+  const token = authHeader.substring(7);
 
   let user: IUserModel;
   try {
