@@ -19,14 +19,15 @@ export const createRoster = async (req: Request, res: Response) => {
 
   let owner: IUserModel;
   try {
-    owner = await User.findById(req.body.ownerId);
+    owner = await User.findById(req.body.ownerId, { password: 0 });
   } catch (err) {
     return res.status(500).send('Issue getting owner for roster.');
   }
 
   let members: IUserModel[];
   try {
-    members = await User.find({ _id: { $in: req.body.memberIds } });
+    members = await User.find({ _id: { $in: req.body.memberIds } }, { password: 0 });
+    console.log(members);
   } catch (err) {
     return res.status(500).send('Issue getting one or more of the members for the roster.');
   }
@@ -41,8 +42,8 @@ export const createRoster = async (req: Request, res: Response) => {
 
   const newRoster = new Roster({
     name: req.body.name,
-    ownerId: req.body.ownerId,
-    memberIds: req.body.memberIds,
+    owner,
+    members,
     quorum: req.body.quorum
   });
 

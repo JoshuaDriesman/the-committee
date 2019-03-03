@@ -1,16 +1,17 @@
 import mongoose from 'mongoose';
+import { IUserModel } from './user';
 
 export interface IRosterModel extends mongoose.Document {
   name: string;
-  ownerId: string;
-  memberIds?: string[];
+  owner: IUserModel;
+  members: IUserModel[];
   quorum: number;
 }
 
 export const RosterSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  ownerId: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true },
-  memberIds: { type: [mongoose.SchemaTypes.ObjectId], ref: 'User' },
+  owner: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true },
+  members: { type: [mongoose.SchemaTypes.ObjectId], ref: 'User' },
   quorum: { type: Number, required: true }
 });
 
