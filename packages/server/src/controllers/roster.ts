@@ -27,7 +27,6 @@ export const createRoster = async (req: Request, res: Response) => {
   let members: IUserModel[];
   try {
     members = await User.find({ _id: { $in: req.body.memberIds } }, { password: 0 });
-    console.log(members);
   } catch (err) {
     return res.status(500).send('Issue getting one or more of the members for the roster.');
   }
