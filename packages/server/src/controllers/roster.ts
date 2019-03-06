@@ -26,9 +26,14 @@ export const createRoster = async (req: Request, res: Response) => {
 
   let members: IUserModel[];
   try {
-    members = await User.find({ _id: { $in: req.body.memberIds } }, { password: 0 });
+    members = await User.find(
+      { _id: { $in: req.body.memberIds } },
+      { password: 0 }
+    );
   } catch (err) {
-    return res.status(500).send('Issue getting one or more of the members for the roster.');
+    return res
+      .status(500)
+      .send('Issue getting one or more of the members for the roster.');
   }
 
   if (!owner) {
@@ -36,7 +41,11 @@ export const createRoster = async (req: Request, res: Response) => {
   }
 
   if (members.length !== req.body.memberIds.length) {
-    return res.status(404).send('One or more of the members given do not exist, or there is a duplicate member.');
+    return res
+      .status(404)
+      .send(
+        'One or more of the members given do not exist, or there is a duplicate member.'
+      );
   }
 
   const newRoster = new Roster({
@@ -52,4 +61,24 @@ export const createRoster = async (req: Request, res: Response) => {
   } catch (err) {
     return res.status(500).send('Could not save roster');
   }
+};
+
+export const getRoster = async (req: Request, res: Response) => {
+  const rosterId = req.params.rosterId;
+
+  let roster: IRosterModel;
+  try {
+    roster = await Roster.findById(rosterId)
+      .populate('owner', { password: 0 })
+      .populate('members.list', { password: 0 })
+      .exec();
+  } catch (acc) {
+    return res.status(500).send(`Issue getting the roster with ID ${rosterId}`);
+  }
+
+  if (!roster) {
+    return res.status(404).send(`Could not find roster with ID ${rosterId}`);
+  }
+
+  return res.send(roster);
 };

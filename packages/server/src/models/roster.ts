@@ -11,7 +11,7 @@ export interface IRosterModel extends mongoose.Document {
 export const RosterSchema = new mongoose.Schema({
   name: { type: String, required: true },
   owner: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true },
-  members: { type: [mongoose.SchemaTypes.ObjectId], ref: 'User' },
+  members: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'User' }],
   quorum: { type: Number, required: true }
 });
 
