@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import Roster, { IRosterModel } from '../models/roster';
+import Roster, { IRosterModel, RosterSchema } from '../models/roster';
 import User, { IUserModel } from '../models/user';
 
 export const createRoster = async (req: Request, res: Response) => {
@@ -86,10 +86,14 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
   }
 
   if (!newMember) {
-    return res.status(404).send(`New member with email ${memberEmail}`);
+    return res
+      .status(404)
+      .send(`New member with email ${memberEmail} does not exist`);
   }
 
-  roster.members.push(newMember.id);
+  if (roster.members.indexOf(newMember.id) === -1) {
+    roster.members.push(newMember);
+  }
 
   let updatedRoster: IRosterModel;
   try {
@@ -122,7 +126,10 @@ const getRosterHelper = async (rosterId: string) => {
       .populate('members.list', { password: 0 })
       .exec();
   } catch (err) {
-    throw { error: `Error getting the roster with ID ${rosterId}`, resCode: 500 };
+    throw {
+      error: `Error getting the roster with ID ${rosterId}`,
+      resCode: 500
+    };
   }
 
   if (!roster) {
