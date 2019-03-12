@@ -57,7 +57,7 @@ export const createRoster = async (req: Request, res: Response) => {
 
   try {
     const savedRoster = await newRoster.save();
-    return res.send(savedRoster);
+    return res.status(201).send(savedRoster);
   } catch (err) {
     return res.status(500).send('Could not save roster');
   }
@@ -105,6 +105,36 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
   return res.send(updatedRoster);
 };
 
+export const removeMemberByEmail = async (
+  req: Request,
+  res: Response
+) => {
+  const rosterId = req.params.rosterId;
+  const memberEmail = req.params.memberEmail;
+
+  let roster: IRosterModel;
+  try {
+    roster = await getRosterHelper(rosterId);
+  } catch (err) {
+    return res.status(err.resCode).send(err.error);
+  }
+
+  if (req.user.id !== roster.owner.id) {
+    return res.status(403).send('You cannot modify a roster you do not own.');
+  }
+
+  roster.members = roster.members.filter(v => v.email !== memberEmail);
+
+  let updatedRoster: IRosterModel;
+  try {
+    updatedRoster = await roster.save();
+  } catch (err) {
+    return res.status(500).send('Error updating roster.');
+  }
+
+  return res.send(updatedRoster);
+};
+
 export const getRoster = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
 
@@ -123,7 +153,7 @@ const getRosterHelper = async (rosterId: string) => {
   try {
     roster = await Roster.findById(rosterId)
       .populate('owner', { password: 0 })
-      .populate('members.list', { password: 0 })
+      .populate('members', { password: 0 })
       .exec();
   } catch (err) {
     throw {
