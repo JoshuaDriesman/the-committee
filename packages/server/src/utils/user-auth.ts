@@ -13,7 +13,8 @@ export type UserJWT = {
   exp: number
 }
 
-export let getUserFromJWT = async (jwtString: string): Promise<IUserModel> => {
+export let getUserFromAuthHeader = async (authHeader: string): Promise<IUserModel> => {
+  const jwtString = authHeader.substring(7);
   const userId: string = (jwt.verify(jwtString, authConfig.secretToken) as UserJWT).id as string;
   
   let user: IUserModel;
@@ -37,11 +38,9 @@ export let isAuthenticated = async (req: Request, res: Response, next: () => voi
     return;
   }
 
-  const token = authHeader.substring(7);
-
   let user: IUserModel;
   try {
-    user = await getUserFromJWT(token);
+    user = await getUserFromAuthHeader(authHeader);
   } catch (err) {
     res.status(500).send('Error verifying token.');
     return;

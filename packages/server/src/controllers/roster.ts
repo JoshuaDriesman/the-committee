@@ -2,6 +2,7 @@ import { Request, Response, response } from 'express';
 
 import Roster, { IRosterModel } from '../models/roster';
 import User, { IUserModel } from '../models/user';
+import { getUserFromAuthHeader } from '../utils/user-auth';
 
 export const createRoster = async (req: Request, res: Response) => {
   req.assert('name', 'Roster name is required.').notEmpty();
@@ -69,13 +70,19 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
 
   let roster: IRosterModel;
   try {
-    roster = await Roster.findById(rosterId).exec();
+    roster = await Roster.findById(rosterId)
+      .populate('owner')
+      .exec();
   } catch (err) {
-    return res.status(500).send('Could not retrieve specified roster.')
+    return res.status(500).send('Could not retrieve specified roster.');
   }
 
   if (!roster) {
     return res.status(404).send(`No roster with ID ${rosterId}`);
+  }
+
+  if (req.user.id !== roster.owner.id) {
+    return res.status(403).send('You cannot modify a roster you do not own.');
   }
 
   let newMember: IUserModel;
@@ -90,7 +97,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
   }
 
   roster.members.push(newMember.id);
-  
+
   let updatedRoster: IRosterModel;
   try {
     updatedRoster = await roster.save();
