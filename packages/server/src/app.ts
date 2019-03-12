@@ -10,6 +10,7 @@ import { isAuthenticated } from './utils/user-auth';
 import {
   addMemberByEmail,
   createRoster,
+  deleteRoster,
   getRoster,
   removeMemberByEmail
 } from './controllers/roster';
@@ -38,6 +39,7 @@ app.get('/user/:userId', isAuthenticated, getUser);
 app.get('/user/byEmail/:email', isAuthenticated, getUserByEmail);
 
 app.post('/roster', isAuthenticated, createRoster);
+app.delete('/roster/:rosterId', isAuthenticated, deleteRoster);
 app.put(
   '/roster/:rosterId/addMemberByEmail/:memberEmail',
   isAuthenticated,

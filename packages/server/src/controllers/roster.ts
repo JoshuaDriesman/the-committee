@@ -63,6 +63,29 @@ export const createRoster = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteRoster = async (req: Request, res: Response) => {
+  const rosterId = req.params.rosterId;
+
+  let roster: IRosterModel;
+  try {
+    roster = await getRosterHelper(rosterId);
+  } catch (err) {
+    return res.status(err.resCode).send(err.error);
+  }
+
+  if (req.user.id !== roster.owner.id) {
+    return res.status(403).send('You cannot modify a roster you do not own.');
+  }
+
+  try {
+    await Roster.deleteOne({ _id: rosterId });
+  } catch (err) {
+    return res.status(500).send(`Error deleting roster with ID ${rosterId}`);
+  }
+
+  return res.send(true);
+};
+
 export const addMemberByEmail = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
   const memberEmail = req.params.memberEmail;
