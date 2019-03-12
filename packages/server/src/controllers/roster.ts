@@ -63,6 +63,44 @@ export const createRoster = async (req: Request, res: Response) => {
   }
 };
 
+export const addMemberByEmail = async (req: Request, res: Response) => {
+  const rosterId = req.params.rosterId;
+  const memberEmail = req.params.memberEmail;
+
+  let roster: IRosterModel;
+  try {
+    roster = await Roster.findById(rosterId).exec();
+  } catch (err) {
+    return res.status(500).send('Could not retrieve specified roster.')
+  }
+
+  if (!roster) {
+    return res.status(404).send(`No roster with ID ${rosterId}`);
+  }
+
+  let newMember: IUserModel;
+  try {
+    newMember = await User.findOne({ email: memberEmail }, { _id: 1 }).exec();
+  } catch (err) {
+    return res.status(500).send('Could not retrieve specified member.');
+  }
+
+  if (!newMember) {
+    return res.status(404).send(`New member with email ${memberEmail}`);
+  }
+
+  roster.members.push(newMember.id);
+  
+  let updatedRoster: IRosterModel;
+  try {
+    updatedRoster = await roster.save();
+  } catch (err) {
+    return res.status(500).send('Error updating roster.');
+  }
+
+  return res.send(updatedRoster);
+};
+
 export const getRoster = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
 
