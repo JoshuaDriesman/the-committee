@@ -1,8 +1,7 @@
-import { Request, Response, response } from 'express';
+import { Request, Response } from 'express';
 
 import Roster, { IRosterModel } from '../models/roster';
 import User, { IUserModel } from '../models/user';
-import { getUserFromAuthHeader } from '../utils/user-auth';
 
 export const createRoster = async (req: Request, res: Response) => {
   req.assert('name', 'Roster name is required.').notEmpty();
@@ -70,15 +69,9 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
 
   let roster: IRosterModel;
   try {
-    roster = await Roster.findById(rosterId)
-      .populate('owner')
-      .exec();
+    roster = await getRosterHelper(rosterId);
   } catch (err) {
-    return res.status(500).send('Could not retrieve specified roster.');
-  }
-
-  if (!roster) {
-    return res.status(404).send(`No roster with ID ${rosterId}`);
+    return res.status(err.resCode).send(err.error);
   }
 
   if (req.user.id !== roster.owner.id) {
@@ -113,17 +106,28 @@ export const getRoster = async (req: Request, res: Response) => {
 
   let roster: IRosterModel;
   try {
+    roster = await getRosterHelper(rosterId);
+  } catch (err) {
+    return res.status(err.resCode).send(err.error);
+  }
+
+  return res.send(roster);
+};
+
+const getRosterHelper = async (rosterId: string) => {
+  let roster: IRosterModel;
+  try {
     roster = await Roster.findById(rosterId)
       .populate('owner', { password: 0 })
       .populate('members.list', { password: 0 })
       .exec();
-  } catch (acc) {
-    return res.status(500).send(`Issue getting the roster with ID ${rosterId}`);
+  } catch (err) {
+    throw { error: `Error getting the roster with ID ${rosterId}`, resCode: 500 };
   }
 
   if (!roster) {
-    return res.status(404).send(`Could not find roster with ID ${rosterId}`);
+    throw { error: `Could not find roster with ID ${rosterId}`, resCode: 404 };
   }
 
-  return res.send(roster);
+  return roster;
 };
