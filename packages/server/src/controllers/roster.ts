@@ -105,10 +105,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
   return res.send(updatedRoster);
 };
 
-export const removeMemberByEmail = async (
-  req: Request,
-  res: Response
-) => {
+export const removeMemberByEmail = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
   const memberEmail = req.params.memberEmail;
 
