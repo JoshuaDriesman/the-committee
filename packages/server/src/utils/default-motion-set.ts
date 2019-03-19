@@ -65,12 +65,19 @@ const DEFAULT_MOTIONS = [
   }
 ];
 
-const generateAndSaveDefaultMotionSet = (owner: IUserModel) => {
-  DEFAULT_MOTIONS.forEach(async (motionTemplate) => {
-    const completeMotion = Object.assign({}, motionTemplate, { owner })
+/**
+ * Generates a set of default motion types and saves them in the DB.
+ * @param owner The user that will be the owner of each of the new motion types.
+ */
+const generateAndSaveDefaultMotionSet = async (owner: IUserModel) => {
+  const resultingMotions = new Array();
+  for (const motionTemplate of DEFAULT_MOTIONS) {
+    const completeMotion = Object.assign({}, motionTemplate, { owner });
     const motionType = new MotionType(completeMotion);
-    motionType.save();
-  });
-}
+
+    resultingMotions.push(await motionType.save());
+  };
+  return resultingMotions;
+};
 
 export default generateAndSaveDefaultMotionSet;
