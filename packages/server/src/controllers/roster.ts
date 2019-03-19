@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import Roster, { IRosterModel, RosterSchema } from '../models/roster';
+import Roster, { IRosterModel } from '../models/roster';
 import User, { IUserModel } from '../models/user';
 
 export const createRoster = async (req: Request, res: Response) => {
