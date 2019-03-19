@@ -3,6 +3,7 @@
  * These motions make up the rule set for the meeting.
  */
 import mongoose from 'mongoose';
+import { IUserModel } from './user';
 
 export enum MotionClass {
   MAIN = 'main',
@@ -34,6 +35,7 @@ export interface IMotionType extends mongoose.Document {
   amendable: boolean;
   interrupts: boolean;
   votingType: VotingThreshold;
+  owner: IUserModel;
 }
 
 export const MotionTypeSchema = new mongoose.Schema({
@@ -66,7 +68,8 @@ export const MotionTypeSchema = new mongoose.Schema({
       VotingThreshold.TWO_THIRDS,
       VotingThreshold.NA
     ]
-  }
+  },
+  owner: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true }
 });
 
 const MotionType = mongoose.model<IMotionType>('MotionType', MotionTypeSchema);

@@ -1,5 +1,6 @@
 import MotionType, { Debatable, MotionClass } from '../models/motion-type';
 import { VotingThreshold } from '../models/motion-type';
+import { IUserModel } from '../models/user';
 
 /**
  * Represents the default set of motions available.
@@ -64,9 +65,10 @@ const DEFAULT_MOTIONS = [
   }
 ];
 
-const generateAndSaveDefaultMotionSet = () => {
+const generateAndSaveDefaultMotionSet = (owner: IUserModel) => {
   DEFAULT_MOTIONS.forEach(async (motionTemplate) => {
-    const motionType = new MotionType(motionTemplate);
+    const completeMotion = Object.assign({}, motionTemplate, { owner })
+    const motionType = new MotionType(completeMotion);
     motionType.save();
   });
 }
