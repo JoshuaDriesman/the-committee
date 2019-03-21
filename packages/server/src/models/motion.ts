@@ -4,12 +4,12 @@
  */
 import mongoose from 'mongoose';
 import { IMotionType } from './motion-type';
-import { IUserModel } from './user';
+import { IUser } from './user';
 
 export interface IMotion extends mongoose.Document {
   motionType: IMotionType;
-  owner: IUserModel;
-  secondedBy?: IUserModel;
+  owner: IUser;
+  secondedBy?: IUser;
   effects?: IMotion;
 }
 

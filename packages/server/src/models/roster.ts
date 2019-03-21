@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
-import { IUserModel } from './user';
+import { IUser } from './user';
 
-export interface IRosterModel extends mongoose.Document {
+export interface IRoster extends mongoose.Document {
   name: string;
-  owner: IUserModel;
-  members: IUserModel[];
+  owner: IUser;
+  members: IUser[];
   quorum: number;
 }
 
@@ -15,6 +15,6 @@ export const RosterSchema = new mongoose.Schema({
   quorum: { type: Number, required: true }
 });
 
-const Roster = mongoose.model<IRosterModel>('Roster', RosterSchema);
+const Roster = mongoose.model<IRoster>('Roster', RosterSchema);
 
 export default Roster;

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import Roster, { IRosterModel } from '../models/roster';
-import User, { IUserModel } from '../models/user';
+import Roster, { IRoster } from '../models/roster';
+import User, { IUser } from '../models/user';
 
 export const createRoster = async (req: Request, res: Response) => {
   req.assert('name', 'Roster name is required.').notEmpty();
@@ -17,14 +17,14 @@ export const createRoster = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  let owner: IUserModel;
+  let owner: IUser;
   try {
     owner = await User.findById(req.body.ownerId, { password: 0 });
   } catch (err) {
     return res.status(500).send('Issue getting owner for roster.');
   }
 
-  let members: IUserModel[];
+  let members: IUser[];
   try {
     members = await User.find(
       { _id: { $in: req.body.memberIds } },
@@ -66,7 +66,7 @@ export const createRoster = async (req: Request, res: Response) => {
 export const deleteRoster = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
 
-  let roster: IRosterModel;
+  let roster: IRoster;
   try {
     roster = await getRosterHelper(rosterId);
   } catch (err) {
@@ -90,7 +90,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
   const memberEmail = req.params.memberEmail;
 
-  let roster: IRosterModel;
+  let roster: IRoster;
   try {
     roster = await getRosterHelper(rosterId);
   } catch (err) {
@@ -101,7 +101,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
     return res.status(403).send('You cannot modify a roster you do not own.');
   }
 
-  let newMember: IUserModel;
+  let newMember: IUser;
   try {
     newMember = await User.findOne({ email: memberEmail }, { _id: 1 }).exec();
   } catch (err) {
@@ -118,7 +118,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
     roster.members.push(newMember);
   }
 
-  let updatedRoster: IRosterModel;
+  let updatedRoster: IRoster;
   try {
     updatedRoster = await roster.save();
   } catch (err) {
@@ -132,7 +132,7 @@ export const removeMemberByEmail = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
   const memberEmail = req.params.memberEmail;
 
-  let roster: IRosterModel;
+  let roster: IRoster;
   try {
     roster = await getRosterHelper(rosterId);
   } catch (err) {
@@ -145,7 +145,7 @@ export const removeMemberByEmail = async (req: Request, res: Response) => {
 
   roster.members = roster.members.filter(v => v.email !== memberEmail);
 
-  let updatedRoster: IRosterModel;
+  let updatedRoster: IRoster;
   try {
     updatedRoster = await roster.save();
   } catch (err) {
@@ -158,7 +158,7 @@ export const removeMemberByEmail = async (req: Request, res: Response) => {
 export const getRoster = async (req: Request, res: Response) => {
   const rosterId = req.params.rosterId;
 
-  let roster: IRosterModel;
+  let roster: IRoster;
   try {
     roster = await getRosterHelper(rosterId);
   } catch (err) {
@@ -169,7 +169,7 @@ export const getRoster = async (req: Request, res: Response) => {
 };
 
 const getRosterHelper = async (rosterId: string) => {
-  let roster: IRosterModel;
+  let roster: IRoster;
   try {
     roster = await Roster.findById(rosterId)
       .populate('owner', { password: 0 })

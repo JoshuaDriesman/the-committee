@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../config/auth';
-import User, { IUserModel } from '../models/user';
+import User, { IUser } from '../models/user';
 
 export type UserJWT = {
   id?: string,
@@ -13,11 +13,11 @@ export type UserJWT = {
   exp: number
 }
 
-export let getUserFromAuthHeader = async (authHeader: string): Promise<IUserModel> => {
+export let getUserFromAuthHeader = async (authHeader: string): Promise<IUser> => {
   const jwtString = authHeader.substring(7);
   const userId: string = (jwt.verify(jwtString, authConfig.secretToken) as UserJWT).id as string;
   
-  let user: IUserModel;
+  let user: IUser;
   try {
     user = await User.findById(userId, { password: 0 }).exec();
   } catch (err) {
@@ -38,7 +38,7 @@ export let isAuthenticated = async (req: Request, res: Response, next: () => voi
     return;
   }
 
-  let user: IUserModel;
+  let user: IUser;
   try {
     user = await getUserFromAuthHeader(authHeader);
   } catch (err) {

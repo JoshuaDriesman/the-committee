@@ -1,6 +1,6 @@
 import MotionType, { Debatable, MotionClass } from '../models/motion-type';
 import { VotingThreshold } from '../models/motion-type';
-import { IUserModel } from '../models/user';
+import { IUser } from '../models/user';
 
 /**
  * Represents the default set of motions available.
@@ -69,7 +69,7 @@ const DEFAULT_MOTIONS = [
  * Generates a set of default motion types and saves them in the DB.
  * @param owner The user that will be the owner of each of the new motion types.
  */
-const generateAndSaveDefaultMotionSet = async (owner: IUserModel) => {
+const generateAndSaveDefaultMotionSet = async (owner: IUser) => {
   const resultingMotions = new Array();
   for (const motionTemplate of DEFAULT_MOTIONS) {
     const completeMotion = Object.assign({}, motionTemplate, { owner });

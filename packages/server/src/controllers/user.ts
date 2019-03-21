@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../config/auth';
-import User, { IUserModel } from '../models/user';
+import User, { IUser } from '../models/user';
 
-const generateToken = (user: IUserModel): string => {
+const generateToken = (user: IUser): string => {
   return jwt.sign({ id: user.id }, authConfig.secretToken, {
     expiresIn: authConfig.tokenExpirationTime
   });
@@ -57,7 +57,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  let user: IUserModel;
+  let user: IUser;
   try {
     user = await User.findOne({ email: req.body.email }).exec();
   } catch (err) {
