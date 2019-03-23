@@ -1,3 +1,4 @@
+import MotionSet from '../models/motion-set';
 import MotionType, { Debatable, MotionClass } from '../models/motion-type';
 import { VotingThreshold } from '../models/motion-type';
 import { IUser } from '../models/user';
@@ -76,8 +77,22 @@ const generateAndSaveDefaultMotionSet = async (owner: IUser) => {
     const motionType = new MotionType(completeMotion);
 
     resultingMotions.push(await motionType.save());
-  };
-  return resultingMotions;
+  }
+
+  const motionSet = new MotionSet({
+    name: 'Default',
+    owner,
+    motionTypes: resultingMotions
+  });
+
+  let savedMotionSet;
+  try {
+    savedMotionSet = await motionSet.save();
+  } catch (err) {
+    throw err;
+  }
+
+  return savedMotionSet;
 };
 
 export default generateAndSaveDefaultMotionSet;
