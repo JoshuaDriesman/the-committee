@@ -48,3 +48,30 @@ UserSchema.methods.comparePassword = comparePassword;
 const User = mongoose.model<IUser>('User', UserSchema);
 
 export default User;
+
+/**
+ * A safe way to get users by ID. Automatically masks the password 
+ * as well as checks for errors in DB query and empty results.
+ * Returns errors in a controller friendly format.
+ * @param userId the ID of the user to retrieve
+ */
+export const fetchUserById = async (userId: string) => {
+  let user;
+  try {
+    user = await User.findById(userId, { password: 0 });
+  } catch (err) {
+    throw {
+      error: `Error getting user with ID ${userId}`,
+      resCode: 500
+    };
+  }
+
+  if (!user) {
+    throw {
+      error: `User not found for ${userId}`,
+      resCode: 404
+    };
+  }
+
+  return user;
+}

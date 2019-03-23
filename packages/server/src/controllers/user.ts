@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../config/auth';
-import User, { IUser } from '../models/user';
+import User, { IUser, fetchUserById } from '../models/user';
 
 const generateToken = (user: IUser): string => {
   return jwt.sign({ id: user.id }, authConfig.secretToken, {
@@ -89,13 +89,9 @@ export const getUser = async (req: Request, res: Response) => {
 
   let user;
   try {
-    user = await User.findById(userId, { password: 0 });
+    user = await fetchUserById(userId);
   } catch (err) {
-    return res.status(500).send(`Could not get user with ID ${userId}`);
-  }
-
-  if (!user) {
-    return res.status(404).send(`User not found for ${userId}`);
+    return res.status(err.resCode).send(err.error);
   }
 
   return res.send(user);
