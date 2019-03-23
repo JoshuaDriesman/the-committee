@@ -21,14 +21,3 @@ export const getMotionTypeForUser = async (req: Request, res: Response) => {
 
   return res.send(motionTypes);
 }
-
-export const generateDefaultMotionTypes = async (req: Request, res: Response) => {
-  let savedMotions;
-  try {
-    savedMotions = await generateAndSaveDefaultMotionSet(req.user);
-  } catch (err) {
-    return res.status(500).send(`Failed to create default motion types for user with ID ${req.user.id}`);
-  }
-
-  return res.status(201).send(savedMotions);
-}
