@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import Roster, { IRoster } from '../models/roster';
-import User, { IUser } from '../models/user';
+import Roster, { fetchRosterById, IRoster } from '../models/roster';
+import User, { fetchUserById, IUser } from '../models/user';
 
 export const createRoster = async (req: Request, res: Response) => {
   req.assert('name', 'Roster name is required.').notEmpty();
@@ -19,9 +19,9 @@ export const createRoster = async (req: Request, res: Response) => {
 
   let owner: IUser;
   try {
-    owner = await User.findById(req.body.ownerId, { password: 0 });
+    owner = await fetchUserById(req.body.ownerId);
   } catch (err) {
-    return res.status(500).send('Issue getting owner for roster.');
+    return res.status(err.resCode).send(err.error);
   }
 
   let members: IUser[];
@@ -34,10 +34,6 @@ export const createRoster = async (req: Request, res: Response) => {
     return res
       .status(500)
       .send('Issue getting one or more of the members for the roster.');
-  }
-
-  if (!owner) {
-    return res.status(404).send('Owner for the roster does not exist.');
   }
 
   if (members.length !== req.body.memberIds.length) {
@@ -68,7 +64,7 @@ export const deleteRoster = async (req: Request, res: Response) => {
 
   let roster: IRoster;
   try {
-    roster = await getRosterHelper(rosterId);
+    roster = await fetchRosterById(rosterId);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
@@ -92,7 +88,7 @@ export const addMemberByEmail = async (req: Request, res: Response) => {
 
   let roster: IRoster;
   try {
-    roster = await getRosterHelper(rosterId);
+    roster = await fetchRosterById(rosterId);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
@@ -134,7 +130,7 @@ export const removeMemberByEmail = async (req: Request, res: Response) => {
 
   let roster: IRoster;
   try {
-    roster = await getRosterHelper(rosterId);
+    roster = await fetchRosterById(rosterId);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
@@ -160,31 +156,10 @@ export const getRoster = async (req: Request, res: Response) => {
 
   let roster: IRoster;
   try {
-    roster = await getRosterHelper(rosterId);
+    roster = await fetchRosterById(rosterId);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
 
   return res.send(roster);
-};
-
-const getRosterHelper = async (rosterId: string) => {
-  let roster: IRoster;
-  try {
-    roster = await Roster.findById(rosterId)
-      .populate('owner', { password: 0 })
-      .populate('members', { password: 0 })
-      .exec();
-  } catch (err) {
-    throw {
-      error: `Error getting the roster with ID ${rosterId}`,
-      resCode: 500
-    };
-  }
-
-  if (!roster) {
-    throw { error: `Could not find roster with ID ${rosterId}`, resCode: 404 };
-  }
-
-  return roster;
 };
