@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-import Meeting, { IMeeting, MeetingStatus } from "../models/meeting";
-import { IMotion } from "../models/motion";
-import { fetchRosterById, IRoster } from "../models/roster";
-import { fetchUserById, IUser } from "../models/user";
+import Meeting, { IMeeting, MeetingStatus } from '../models/meeting';
+import { IMotion } from '../models/motion';
+import { fetchMotionSetById, IMotionSet } from '../models/motion-set';
+import { fetchRosterById, IRoster } from '../models/roster';
+import { fetchUserById, IUser } from '../models/user';
 
 /**
  * Controller for meeting functionality.
@@ -19,22 +20,30 @@ export const startMeeting = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  let roster : IRoster;
+  let roster: IRoster;
   try {
     roster = await fetchRosterById(req.body.rosterId);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
 
-  let chair : IUser;
+  let chair: IUser;
   try {
     chair = await fetchUserById(req.user);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
 
+  let motionSet: IMotionSet;
+  try {
+    motionSet = await fetchMotionSetById(req.body.motionSetId);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
   const meeting = new Meeting({
     name: req.body.name,
+    motionSet,
     pendingMotions: new Array<IMotion>(),
     motionHistory: new Array<IMotion>(),
     motionQueue: new Array<IMotion>(),
@@ -44,7 +53,7 @@ export const startMeeting = async (req: Request, res: Response) => {
     startDateTime: new Date()
   });
 
-  let savedMeeting : IMeeting;
+  let savedMeeting: IMeeting;
   try {
     savedMeeting = await meeting.save();
   } catch (err) {
@@ -52,4 +61,4 @@ export const startMeeting = async (req: Request, res: Response) => {
   }
 
   return res.send(savedMeeting);
-}
+};
