@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 
+import {
+  IAttendanceRecord,
+  initializeAttendanceRecordFromRoster
+} from '../models/attendance-record';
 import Meeting, { IMeeting, MeetingStatus } from '../models/meeting';
 import { IMotion } from '../models/motion';
 import { fetchMotionSetById, IMotionSet } from '../models/motion-set';
@@ -27,6 +31,15 @@ export const startMeeting = async (req: Request, res: Response) => {
     return res.status(err.resCode).send(err.error);
   }
 
+  let attendanceRecord: IAttendanceRecord;
+  try {
+    attendanceRecord = await initializeAttendanceRecordFromRoster(roster);
+  } catch (err) {
+    return res
+      .status(500)
+      .send('There was an error creating an attendance record.');
+  }
+
   let chair: IUser;
   try {
     chair = await fetchUserById(req.user);
@@ -47,7 +60,7 @@ export const startMeeting = async (req: Request, res: Response) => {
     pendingMotions: new Array<IMotion>(),
     motionHistory: new Array<IMotion>(),
     motionQueue: new Array<IMotion>(),
-    roster,
+    attendanceRecord,
     chair,
     status: MeetingStatus.IN_PROGRESS,
     startDateTime: new Date()

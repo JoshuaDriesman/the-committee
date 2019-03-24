@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
+import { IAttendanceRecord } from './attendance-record';
 import { IMotion } from './motion';
 import { IMotionType } from './motion-type';
-import { IRoster } from './roster';
 import { IUser } from './user';
 
 /**
@@ -20,7 +20,6 @@ export interface IMeeting extends mongoose.Document {
   pendingMotions: IMotion[];
   motionHistory: IMotion[];
   motionQueue: IMotion[];
-  roster: IRoster;
   chair: IUser;
   status: MeetingStatus;
   startDateTime: Date;
@@ -41,10 +40,9 @@ export const MeetingSchema = new mongoose.Schema({
   motionQueue: [
     { type: mongoose.SchemaTypes.ObjectId, ref: 'Motion', required: true }
   ],
-  roster: {
+  attendanceRecord: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: 'Roster',
-    required: true
+    ref: 'AttendanceRecord'
   },
   chair: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true },
   status: {
