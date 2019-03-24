@@ -108,6 +108,10 @@ export const adjournMeeting = async (req: Request, res: Response) => {
     return res.status(err.code).send(err.msg);
   }
 
+  if (req.user.id !== meeting.chair.id) {
+    return res.status(403).send('You must be chair of the meeting to adjourn it.');
+  }
+
   if (meeting.status === MeetingStatus.ADJOURNED) {
     return res.status(400).send(`Meeting ${req.params.meetingId} is already adjourned.`);
   }
@@ -128,6 +132,8 @@ export const adjournMeeting = async (req: Request, res: Response) => {
 
   meeting.pendingMotions = [];
   meeting.motionQueue = [];
+
+  meeting.endDateTime = new Date();
 
   try {
     meeting = await meeting.save();
