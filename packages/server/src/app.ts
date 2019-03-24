@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import serverConfig from './config/server';
 import { isAuthenticated } from './utils/user-auth';
 
-import { startMeeting } from './controllers/meeting';
+import { getMeeting, startMeeting } from './controllers/meeting';
 import { generateDefaultMotionTypes } from './controllers/motion-set';
 import { getMotionTypeForUser } from './controllers/motion-type';
 import {
@@ -60,5 +60,6 @@ app.get('/motionType', isAuthenticated, getMotionTypeForUser);
 app.post('/motionSet/createDefault', isAuthenticated, generateDefaultMotionTypes);
 
 app.post('/meeting/start', isAuthenticated, startMeeting);
+app.get('/meeting/:meetingId', isAuthenticated, getMeeting);
 
 export default app;

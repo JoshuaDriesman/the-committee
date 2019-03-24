@@ -4,8 +4,12 @@ import {
   IAttendanceRecord,
   initializeAttendanceRecordFromRoster
 } from '../models/attendance-record';
-import Meeting, { IMeeting, MeetingStatus } from '../models/meeting';
-import { IMotion } from '../models/motion';
+import Meeting, {
+  fetchMeetingById,
+  IMeeting,
+  MeetingStatus
+} from '../models/meeting';
+import Motion, { IMotion } from '../models/motion';
 import { fetchMotionSetById, IMotionSet } from '../models/motion-set';
 import { fetchRosterById, IRoster } from '../models/roster';
 import { fetchUserById, IUser } from '../models/user';
@@ -74,4 +78,18 @@ export const startMeeting = async (req: Request, res: Response) => {
   }
 
   return res.send(savedMeeting);
+};
+
+export const getMeeting = async (req: Request, res: Response) => {
+  // tslint:disable:no-unused-expression
+  new Motion({}); // This is a really stupid hack to get the model to initialize if there are none
+
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.params.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  return res.send(meeting);
 };
