@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { AttendanceRecordSchema, IAttendanceRecord } from './attendance-record';
 import { IMotion } from './motion';
-import { IMotionType } from './motion-type';
+import { IMotionSet } from './motion-set';
 import { IUser } from './user';
 
 /**
@@ -16,7 +16,7 @@ export enum MeetingStatus {
 
 export interface IMeeting extends mongoose.Document {
   name: string;
-  motionSet: IMotionType[];
+  motionSet: IMotionSet;
   pendingMotions: IMotion[];
   motionHistory: IMotion[];
   motionQueue: IMotion[];
@@ -29,9 +29,11 @@ export interface IMeeting extends mongoose.Document {
 
 export const MeetingSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  motionSet: [
-    { type: mongoose.SchemaTypes.ObjectId, ref: 'MotionType', required: true }
-  ],
+  motionSet: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'MotionSet',
+    required: true
+  },
   pendingMotions: [
     { type: mongoose.SchemaTypes.ObjectId, ref: 'Motion', required: true }
   ],
