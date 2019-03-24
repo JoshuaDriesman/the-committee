@@ -35,9 +35,9 @@ export const startMeeting = async (req: Request, res: Response) => {
     return res.status(err.resCode).send(err.error);
   }
 
-  let attendanceRecord: IAttendanceRecord;
+  let attendanceRecords: IAttendanceRecord[];
   try {
-    attendanceRecord = await initializeAttendanceRecordFromRoster(roster);
+    attendanceRecords = initializeAttendanceRecordFromRoster(roster);
   } catch (err) {
     return res
       .status(500)
@@ -64,7 +64,7 @@ export const startMeeting = async (req: Request, res: Response) => {
     pendingMotions: new Array<IMotion>(),
     motionHistory: new Array<IMotion>(),
     motionQueue: new Array<IMotion>(),
-    attendanceRecord,
+    attendanceRecords,
     chair,
     status: MeetingStatus.IN_PROGRESS,
     startDateTime: new Date()
@@ -89,6 +89,12 @@ export const getMeeting = async (req: Request, res: Response) => {
     meeting = await fetchMeetingById(req.params.meetingId, true);
   } catch (err) {
     return res.status(err.code).send(err.msg);
+  }
+
+  const memberIds = meeting.attendanceRecords.map((record) => record.member.id);
+
+  if (meeting.chair.id !== req.user.id && !memberIds.includes(req.user.id)) {
+    return res.status(403).send('You must be a member of the meeting\'s roster or the chair of the meeting to get it.');
   }
 
   return res.send(meeting);

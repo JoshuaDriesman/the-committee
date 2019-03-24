@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { IAttendanceRecord } from './attendance-record';
+import { AttendanceRecordSchema, IAttendanceRecord } from './attendance-record';
 import { IMotion } from './motion';
 import { IMotionType } from './motion-type';
 import { IUser } from './user';
@@ -20,6 +20,7 @@ export interface IMeeting extends mongoose.Document {
   pendingMotions: IMotion[];
   motionHistory: IMotion[];
   motionQueue: IMotion[];
+  attendanceRecords: IAttendanceRecord[];
   chair: IUser;
   status: MeetingStatus;
   startDateTime: Date;
@@ -40,10 +41,7 @@ export const MeetingSchema = new mongoose.Schema({
   motionQueue: [
     { type: mongoose.SchemaTypes.ObjectId, ref: 'Motion', required: true }
   ],
-  attendanceRecord: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'AttendanceRecord'
-  },
+  attendanceRecords: [AttendanceRecordSchema],
   chair: { type: mongoose.SchemaTypes.ObjectId, ref: 'User', required: true },
   status: {
     type: String,
@@ -75,7 +73,8 @@ export const fetchMeetingById = async (
         .populate('pendingMotions')
         .populate('motionHistory')
         .populate('motionQueue')
-        .populate('chair')
+        .populate('chair', { password: 0 })
+        .populate('attendanceRecords.member', { password: 0 })
         .exec();
     } else {
       meeting = await Meeting.findById(meetingId);
