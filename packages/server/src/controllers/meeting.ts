@@ -9,7 +9,7 @@ import Meeting, {
   IMeeting,
   MeetingStatus
 } from '../models/meeting';
-import Motion, { IMotion } from '../models/motion';
+import Motion, { IMotion, MotionStatus } from '../models/motion';
 import { fetchMotionSetById, IMotionSet } from '../models/motion-set';
 import { fetchRosterById, IRoster } from '../models/roster';
 import { fetchUserById, IUser } from '../models/user';
@@ -93,3 +93,41 @@ export const getMeeting = async (req: Request, res: Response) => {
 
   return res.send(meeting);
 };
+
+export const adjournMeeting = async (req: Request, res: Response) => {
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.params.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  if (meeting.status === MeetingStatus.ADJOURNED) {
+    return res.status(400).send(`Meeting ${req.params.meetingId} is already adjourned.`);
+  }
+
+  meeting.status = MeetingStatus.ADJOURNED;
+
+  meeting.pendingMotions.forEach(async (motion) => {
+    motion.motionStatus = MotionStatus.TABLED;
+
+    try {
+      await motion.save();
+    } catch (err) {
+      res.status(500).send('Error updating one of the meeting\'s motions');
+    }
+
+    meeting.motionHistory.push(motion);
+  });
+
+  meeting.pendingMotions = [];
+  meeting.motionQueue = [];
+
+  try {
+    meeting = await meeting.save();
+  } catch (err) {
+    return res.status(500).send('Error adjourning the meeting.');
+  }
+
+  return res.send(meeting);
+}
