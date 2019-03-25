@@ -75,3 +75,28 @@ export const MotionTypeSchema = new mongoose.Schema({
 const MotionType = mongoose.model<IMotionType>('MotionType', MotionTypeSchema);
 
 export default MotionType;
+
+/**
+ * Retrieves the motion type with the given ID.
+ * @param motionTypeId the ID of the motion type to retrieve
+ */
+export const fetchMotionTypeById = async (motionTypeId: string) => {
+  let motionType: IMotionType;
+  try {
+    motionType = await MotionType.findById(motionTypeId);
+  } catch (err) {
+    throw {
+      code: 500,
+      msg: `Could not retrieve motion type with ID ${motionTypeId}`
+    };
+  }
+
+  if (!motionType) {
+    throw {
+      code: 404,
+      msg: `No motion type with the ID ${motionTypeId}`
+    };
+  }
+
+  return motionType;
+};

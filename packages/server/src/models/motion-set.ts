@@ -33,7 +33,9 @@ export default MotionSet;
 export const fetchMotionSetById = async (motionSetId: string) => {
   let motionSet;
   try {
-    motionSet = await MotionSet.findById(motionSetId);
+    motionSet = await MotionSet.findById(motionSetId)
+      .populate('motionTypes')
+      .exec();
   } catch (err) {
     throw {
       msg: `Error retrieving motion set with ID: ${motionSetId}`,

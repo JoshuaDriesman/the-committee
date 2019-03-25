@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 
 import {
+  AttendanceStatus,
   IAttendanceRecord,
-  initializeAttendanceRecordFromRoster,
-  AttendanceStatus
+  initializeAttendanceRecordFromRoster
 } from '../models/attendance-record';
 import Meeting, {
   fetchMeetingById,
@@ -133,7 +133,7 @@ export const adjournMeeting = async (req: Request, res: Response) => {
     motion.motionStatus = MotionStatus.TABLED;
 
     try {
-      await motion.save();
+      motion = await motion.save();
     } catch (err) {
       res.status(500).send("Error updating one of the meeting's motions");
     }

@@ -39,8 +39,7 @@ export const MotionSchema = new mongoose.Schema({
   },
   secondedBy: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   effects: { type: mongoose.SchemaTypes.ObjectId, ref: 'Motion' }
 });
@@ -48,3 +47,26 @@ export const MotionSchema = new mongoose.Schema({
 const Motion = mongoose.model<IMotion>('Motion', MotionSchema);
 
 export default Motion;
+
+export const getMotionById = async (motionId: string) => {
+  let motion: IMotion;
+  try {
+    motion = await Motion.findById(motionId)
+      .populate('motionType')
+      .exec();
+  } catch (err) {
+    throw {
+      code: 500,
+      msg: `Could not retrieve the motion with ID ${motionId}`
+    };
+  }
+
+  if (!motion) {
+    throw {
+      code: 404,
+      msg: `No motion exists with the ID ${motionId}`
+    };
+  }
+
+  return motion;
+};

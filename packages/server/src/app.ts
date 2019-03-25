@@ -24,6 +24,7 @@ import {
   removeMemberByEmail
 } from './controllers/roster';
 import { getUser, getUserByEmail, login, register } from './controllers/user';
+import { makeMotion } from './controllers/motion';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
   useNewUrlParser: true
@@ -83,5 +84,7 @@ app.patch(
   isAuthenticated,
   leaveMeeting
 );
+
+app.post('/motion', isAuthenticated, makeMotion);
 
 export default app;

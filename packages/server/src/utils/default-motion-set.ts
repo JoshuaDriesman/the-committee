@@ -20,7 +20,7 @@ const DEFAULT_MOTIONS = [
     votingType: VotingThreshold.MAJORITY
   },
   {
-    name: 'Motion to Amend',
+    name: 'Motion to Amend', // DO NOT CHANGE THIS NAME. It is required to check if motions are being amended correctly. See issue #5 for more info, this should be fixed.
     motionType: MotionClass.SUBSIDIARY,
     description: 'Amends any amendable motion.',
     precedence: 6,

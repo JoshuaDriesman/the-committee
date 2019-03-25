@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 import MotionType from "../models/motion-type";
-import generateAndSaveDefaultMotionSet from '../utils/default-motion-set';
 
 /**
  * Controller for motion types.
