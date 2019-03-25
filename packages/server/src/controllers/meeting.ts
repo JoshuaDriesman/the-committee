@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 
 import {
   IAttendanceRecord,
-  initializeAttendanceRecordFromRoster
+  initializeAttendanceRecordFromRoster,
+  AttendanceStatus
 } from '../models/attendance-record';
 import Meeting, {
   fetchMeetingById,
@@ -91,10 +92,15 @@ export const getMeeting = async (req: Request, res: Response) => {
     return res.status(err.code).send(err.msg);
   }
 
-  const memberIds = meeting.attendanceRecords.map((record) => record.member.id);
-
-  if (meeting.chair.id !== req.user.id && !memberIds.includes(req.user.id)) {
-    return res.status(403).send('You must be a member of the meeting\'s roster or the chair of the meeting to get it.');
+  if (
+    meeting.chair.id !== req.user.id &&
+    !getMemberAttendanceRecord(req.user.id, meeting)
+  ) {
+    return res
+      .status(403)
+      .send(
+        "You must be a member of the meeting's roster or the chair of the meeting to get it."
+      );
   }
 
   return res.send(meeting);
@@ -109,22 +115,26 @@ export const adjournMeeting = async (req: Request, res: Response) => {
   }
 
   if (req.user.id !== meeting.chair.id) {
-    return res.status(403).send('You must be chair of the meeting to adjourn it.');
+    return res
+      .status(403)
+      .send('You must be chair of the meeting to adjourn it.');
   }
 
   if (meeting.status === MeetingStatus.ADJOURNED) {
-    return res.status(400).send(`Meeting ${req.params.meetingId} is already adjourned.`);
+    return res
+      .status(400)
+      .send(`Meeting ${req.params.meetingId} is already adjourned.`);
   }
 
   meeting.status = MeetingStatus.ADJOURNED;
 
-  meeting.pendingMotions.forEach(async (motion) => {
+  meeting.pendingMotions.forEach(async motion => {
     motion.motionStatus = MotionStatus.TABLED;
 
     try {
       await motion.save();
     } catch (err) {
-      res.status(500).send('Error updating one of the meeting\'s motions');
+      res.status(500).send("Error updating one of the meeting's motions");
     }
 
     meeting.motionHistory.push(motion);
@@ -142,4 +152,55 @@ export const adjournMeeting = async (req: Request, res: Response) => {
   }
 
   return res.send(meeting);
-}
+};
+
+export const joinMeeting = async (req: Request, res: Response) => {
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.params.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  if (meeting.status === MeetingStatus.ADJOURNED) {
+    return res.status(400).send('Can not join an adjourned meeting.');
+  }
+
+  let user: IUser;
+  try {
+    user = await fetchUserById(req.user.id);
+  } catch (err) {
+    return res.status(err.resCode).send(err.error);
+  }
+
+  const attendanceRecord = getMemberAttendanceRecord(user.id, meeting);
+
+  if (!attendanceRecord) {
+    return res
+      .status(403)
+      .send('You must be listed as a member of the meeting to join it.');
+  }
+
+  attendanceRecord.status = AttendanceStatus.PRESENT;
+
+  try {
+    meeting = await meeting.save();
+  } catch (err) {
+    return res.status(500).send('Failed to join the meeting');
+  }
+
+  return res.send(meeting);
+};
+
+/**
+ * Gets the user's attendance record if they are a member of the meeting.
+ * Will return undefined if they are not a member of the meeting.
+ * @param userId the user ID to get
+ * @param meeting the meeting in which to look for the user
+ */
+const getMemberAttendanceRecord = (userId: string, meeting: IMeeting) => {
+  const maybeAttendanceRecord = meeting.attendanceRecords.filter(
+    record => record.member.id === userId
+  );
+  return maybeAttendanceRecord.length ? maybeAttendanceRecord[0] : undefined;
+};
