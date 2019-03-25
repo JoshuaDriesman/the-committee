@@ -7,7 +7,13 @@ import mongoose from 'mongoose';
 import serverConfig from './config/server';
 import { isAuthenticated } from './utils/user-auth';
 
-import { adjournMeeting, getMeeting, startMeeting, joinMeeting } from './controllers/meeting';
+import {
+  adjournMeeting,
+  getMeeting,
+  startMeeting,
+  joinMeeting,
+  leaveMeeting
+} from './controllers/meeting';
 import { generateDefaultMotionTypes } from './controllers/motion-set';
 import { getMotionTypeForUser } from './controllers/motion-type';
 import {
@@ -57,7 +63,11 @@ app.get('/roster/:rosterId', isAuthenticated, getRoster);
 
 app.get('/motionType', isAuthenticated, getMotionTypeForUser);
 
-app.post('/motionSet/createDefault', isAuthenticated, generateDefaultMotionTypes);
+app.post(
+  '/motionSet/createDefault',
+  isAuthenticated,
+  generateDefaultMotionTypes
+);
 
 // General meeting endpoints
 app.post('/meeting/start', isAuthenticated, startMeeting);
@@ -68,5 +78,10 @@ app.patch('/meeting/:meetingId/chair/adjourn', isAuthenticated, adjournMeeting);
 
 // Participant meeting endpoints
 app.patch('/meeting/:meetingId/participant/join', isAuthenticated, joinMeeting);
+app.patch(
+  '/meeting/:meetingId/participant/leave',
+  isAuthenticated,
+  leaveMeeting
+);
 
 export default app;

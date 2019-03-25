@@ -162,34 +162,74 @@ export const joinMeeting = async (req: Request, res: Response) => {
     return res.status(err.code).send(err.msg);
   }
 
-  if (meeting.status === MeetingStatus.ADJOURNED) {
-    return res.status(400).send('Can not join an adjourned meeting.');
-  }
-
-  let user: IUser;
   try {
-    user = await fetchUserById(req.user.id);
+    meeting = await changeAttendanceStatus(
+      req.user.id,
+      meeting,
+      AttendanceStatus.PRESENT
+    );
   } catch (err) {
-    return res.status(err.resCode).send(err.error);
+    return res.status(err.code).send(err.msg);
   }
 
-  const attendanceRecord = getMemberAttendanceRecord(user.id, meeting);
+  return res.send(meeting);
+};
+
+export const leaveMeeting = async (req: Request, res: Response) => {
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.params.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  try {
+    meeting = await changeAttendanceStatus(
+      req.user.id,
+      meeting,
+      AttendanceStatus.ABSENT
+    );
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  return res.send(meeting);
+};
+
+const changeAttendanceStatus = async (
+  userId: string,
+  meeting: IMeeting,
+  newStatus: AttendanceStatus
+) => {
+  if (meeting.status === MeetingStatus.ADJOURNED) {
+    throw {
+      code: 400,
+      msg: 'Attendance can not be changed for an adjourned meeting.'
+    };
+  }
+
+  const attendanceRecord = getMemberAttendanceRecord(userId, meeting);
 
   if (!attendanceRecord) {
-    return res
-      .status(403)
-      .send('You must be listed as a member of the meeting to join it.');
+    throw {
+      code: 403,
+      msg:
+        'You must be listed as a member of the meeting to change your attendance.'
+    };
   }
 
-  attendanceRecord.status = AttendanceStatus.PRESENT;
+  attendanceRecord.status = newStatus;
 
   try {
     meeting = await meeting.save();
   } catch (err) {
-    return res.status(500).send('Failed to join the meeting');
+    throw {
+      code: 500,
+      msg: 'Failed to change attendance on meeting.'
+    };
   }
 
-  return res.send(meeting);
+  return meeting;
 };
 
 /**
