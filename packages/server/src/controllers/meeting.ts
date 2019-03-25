@@ -19,6 +19,32 @@ import { fetchUserById, IUser } from '../models/user';
  * Controller for meeting functionality.
  */
 
+export const getMeeting = async (req: Request, res: Response) => {
+  // tslint:disable:no-unused-expression
+  new Motion({}); // This is a really stupid hack to get the model to initialize if there are none
+
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.params.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  if (
+    meeting.chair.id !== req.user.id &&
+    !getMemberAttendanceRecord(req.user.id, meeting)
+  ) {
+    return res
+      .status(403)
+      .send(
+        "You must be a member of the meeting's roster or the chair of the meeting to get it."
+      );
+  }
+
+  return res.send(meeting);
+};
+
+// Chair endpoints
 export const startMeeting = async (req: Request, res: Response) => {
   req.assert('name', 'Meeting name is required').notEmpty();
   req.assert('rosterId', 'Roster ID is required').notEmpty();
@@ -81,31 +107,6 @@ export const startMeeting = async (req: Request, res: Response) => {
   return res.send(savedMeeting);
 };
 
-export const getMeeting = async (req: Request, res: Response) => {
-  // tslint:disable:no-unused-expression
-  new Motion({}); // This is a really stupid hack to get the model to initialize if there are none
-
-  let meeting: IMeeting;
-  try {
-    meeting = await fetchMeetingById(req.params.meetingId, true);
-  } catch (err) {
-    return res.status(err.code).send(err.msg);
-  }
-
-  if (
-    meeting.chair.id !== req.user.id &&
-    !getMemberAttendanceRecord(req.user.id, meeting)
-  ) {
-    return res
-      .status(403)
-      .send(
-        "You must be a member of the meeting's roster or the chair of the meeting to get it."
-      );
-  }
-
-  return res.send(meeting);
-};
-
 export const adjournMeeting = async (req: Request, res: Response) => {
   let meeting: IMeeting;
   try {
@@ -154,6 +155,7 @@ export const adjournMeeting = async (req: Request, res: Response) => {
   return res.send(meeting);
 };
 
+// Participant endpoints.
 export const joinMeeting = async (req: Request, res: Response) => {
   let meeting: IMeeting;
   try {
