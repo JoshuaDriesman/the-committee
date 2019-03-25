@@ -10,10 +10,11 @@ import { isAuthenticated } from './utils/user-auth';
 import {
   adjournMeeting,
   getMeeting,
-  startMeeting,
   joinMeeting,
-  leaveMeeting
+  leaveMeeting,
+  startMeeting
 } from './controllers/meeting';
+import { makeMotion } from './controllers/motion';
 import { generateDefaultMotionTypes } from './controllers/motion-set';
 import { getMotionTypeForUser } from './controllers/motion-type';
 import {
@@ -24,7 +25,6 @@ import {
   removeMemberByEmail
 } from './controllers/roster';
 import { getUser, getUserByEmail, login, register } from './controllers/user';
-import { makeMotion } from './controllers/motion';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
   useNewUrlParser: true
