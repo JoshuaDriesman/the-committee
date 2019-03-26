@@ -26,7 +26,7 @@ export interface IMeeting extends mongoose.Document {
   status: MeetingStatus;
   startDateTime: Date;
   endDateTime: Date;
-  activeVoting?: IVotingRecord;
+  activeVotingRecord?: IVotingRecord;
 }
 
 export const MeetingSchema = new mongoose.Schema({

@@ -44,6 +44,12 @@ export const makeMotion = async (req: Request, res: Response) => {
       .send('Motion can not be attached to an adjourned meeting.');
   }
 
+  if (meeting.activeVotingRecord) {
+    return res
+      .status(400)
+      .send('Can not make a motion while in voting procedure.');
+  }
+
   if (meeting.chair.id !== req.user.id) {
     return res
       .status(403)
