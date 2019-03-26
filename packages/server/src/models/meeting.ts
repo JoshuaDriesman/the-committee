@@ -54,7 +54,10 @@ export const MeetingSchema = new mongoose.Schema({
   },
   startDateTime: { type: Date, required: true },
   endDateTime: Date,
-  activeVoting: { type: mongoose.SchemaTypes.ObjectId, ref: 'VotingRecord' }
+  activeVotingRecord: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'VotingRecord'
+  }
 });
 
 const Meeting = mongoose.model<IMeeting>('Meeting', MeetingSchema);
@@ -78,6 +81,7 @@ export const fetchMeetingById = async (
         .populate('pendingMotions')
         .populate('motionHistory')
         .populate('motionQueue')
+        .populate('activeVotingRecord')
         .populate('chair', { password: 0 })
         .populate('attendanceRecords.member', { password: 0 })
         .exec();

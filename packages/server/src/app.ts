@@ -25,6 +25,7 @@ import {
   removeMemberByEmail
 } from './controllers/roster';
 import { getUser, getUserByEmail, login, register } from './controllers/user';
+import { beginVotingProcedure } from './controllers/voting-record';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
   useNewUrlParser: true
@@ -86,5 +87,7 @@ app.patch(
 );
 
 app.post('/motion', isAuthenticated, makeMotion);
+
+app.post('/voting/begin', isAuthenticated, beginVotingProcedure);
 
 export default app;

@@ -48,7 +48,7 @@ const Motion = mongoose.model<IMotion>('Motion', MotionSchema);
 
 export default Motion;
 
-export const getMotionById = async (motionId: string) => {
+export const fetchMotionById = async (motionId: string) => {
   let motion: IMotion;
   try {
     motion = await Motion.findById(motionId)

@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 
 import { IMeeting, MeetingStatus } from '../models/meeting';
 import { fetchMeetingById } from '../models/meeting';
-import Motion, { getMotionById, IMotion, MotionStatus } from '../models/motion';
+import Motion, {
+  fetchMotionById,
+  IMotion,
+  MotionStatus
+} from '../models/motion';
 import { IMotionSet } from '../models/motion-set';
 import { fetchMotionSetById } from '../models/motion-set';
 import { IMotionType, MotionClass } from '../models/motion-type';
@@ -101,7 +105,7 @@ export const makeMotion = async (req: Request, res: Response) => {
   if (req.body.effectId) {
     let effectedMotion: IMotion;
     try {
-      effectedMotion = await getMotionById(req.body.effectId);
+      effectedMotion = await fetchMotionById(req.body.effectId);
     } catch (err) {
       return res.status(err.code).send(err.msg);
     }
@@ -144,7 +148,7 @@ export const makeMotion = async (req: Request, res: Response) => {
   if (meeting.pendingMotions.length !== 0) {
     let fullPendingMotion: IMotion;
     try {
-      fullPendingMotion = await getMotionById(
+      fullPendingMotion = await fetchMotionById(
         meeting.pendingMotions[meeting.pendingMotions.length - 1].id
       );
     } catch (err) {
