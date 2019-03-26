@@ -81,3 +81,39 @@ export const beginVotingProcedure = async (req: Request, res: Response) => {
 
   return res.send(votingRecord);
 };
+
+export const endVotingProcedure = async (req: Request, res: Response) => {
+  req.assert('meetingId').notEmpty();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    return res.status(400).send(errors);
+  }
+
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.body.meetingId, true);
+  } catch (err) {
+    res.status(err.code).send(err.msg);
+  }
+
+  if (req.user.id !== meeting.chair.id) {
+    return res
+      .status(403)
+      .send('Must be owner of meeting to end voting procedure.');
+  }
+
+  if (!meeting.activeVotingRecord) {
+    res.status(400).send('No active voting procedure for given meeting.');
+  }
+
+  meeting.activeVotingRecord = null;
+
+  try {
+    meeting = await meeting.save();
+  } catch (err) {
+    res.status(500).send('Could not save meeting with ended voting record.');
+  }
+
+  return res.send(meeting);
+};
