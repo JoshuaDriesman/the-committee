@@ -83,10 +83,13 @@ export const fetchVotingRecordById = async (votingRecordId: string) => {
  * @param attendanceRecord The array of attendance records from which to generate the voting record
  * @param motion The motion which the new voting record is being created for
  */
-export const createVotingRecordFromAttendanceRecord = async (attendanceRecords: IAttendanceRecord[], motion: IMotion) {
+export const createVotingRecordFromAttendanceRecord = async (
+  attendanceRecords: IAttendanceRecord[],
+  motion: IMotion
+) => {
   const votes = new Array<IVote>();
 
-  attendanceRecords.forEach((record) => {
+  attendanceRecords.forEach(record => {
     if (record.status === AttendanceStatus.PRESENT && record.voting) {
       const vote = new Vote({
         member: record.member,
@@ -94,7 +97,7 @@ export const createVotingRecordFromAttendanceRecord = async (attendanceRecords: 
       });
       votes.push(vote);
     }
-  })
+  });
 
   let votingRecord = new VotingRecord({
     motion,
@@ -111,4 +114,4 @@ export const createVotingRecordFromAttendanceRecord = async (attendanceRecords: 
   }
 
   return votingRecord;
-}
+};
