@@ -129,6 +129,7 @@ export const adjournMeeting = async (req: Request, res: Response) => {
 
   meeting.status = MeetingStatus.ADJOURNED;
 
+  // This currently does not seem to persist into the DB. Issue # 7
   meeting.pendingMotions.forEach(async motion => {
     motion.motionStatus = MotionStatus.TABLED;
 

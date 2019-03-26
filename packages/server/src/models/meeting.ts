@@ -4,6 +4,7 @@ import { AttendanceRecordSchema, IAttendanceRecord } from './attendance-record';
 import { IMotion } from './motion';
 import { IMotionSet } from './motion-set';
 import { IUser } from './user';
+import { IVotingRecord } from './voting-record';
 
 /**
  * Represents a single instance of a meeting.
@@ -25,6 +26,7 @@ export interface IMeeting extends mongoose.Document {
   status: MeetingStatus;
   startDateTime: Date;
   endDateTime: Date;
+  activeVoting?: IVotingRecord;
 }
 
 export const MeetingSchema = new mongoose.Schema({
@@ -51,7 +53,8 @@ export const MeetingSchema = new mongoose.Schema({
     enum: [MeetingStatus.IN_PROGRESS, MeetingStatus.ADJOURNED]
   },
   startDateTime: { type: Date, required: true },
-  endDateTime: Date
+  endDateTime: Date,
+  activeVoting: { type: mongoose.SchemaTypes.ObjectId, ref: 'VotingRecord' }
 });
 
 const Meeting = mongoose.model<IMeeting>('Meeting', MeetingSchema);
