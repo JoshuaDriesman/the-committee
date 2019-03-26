@@ -158,7 +158,18 @@ export const adjournMeeting = async (req: Request, res: Response) => {
 
 // Participant endpoints.
 export const joinMeeting = async (req: Request, res: Response) => {
+  req
+    .assert('voting')
+    .notEmpty()
+    .isBoolean();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    return res.status(400).send(errors);
+  }
+
   let meeting: IMeeting;
+
   try {
     meeting = await fetchMeetingById(req.params.meetingId, true);
   } catch (err) {
@@ -169,7 +180,8 @@ export const joinMeeting = async (req: Request, res: Response) => {
     meeting = await changeAttendanceStatus(
       req.user.id,
       meeting,
-      AttendanceStatus.PRESENT
+      AttendanceStatus.PRESENT,
+      req.body.voting
     );
   } catch (err) {
     return res.status(err.code).send(err.msg);
@@ -190,7 +202,8 @@ export const leaveMeeting = async (req: Request, res: Response) => {
     meeting = await changeAttendanceStatus(
       req.user.id,
       meeting,
-      AttendanceStatus.ABSENT
+      AttendanceStatus.ABSENT,
+      false
     );
   } catch (err) {
     return res.status(err.code).send(err.msg);
@@ -202,7 +215,8 @@ export const leaveMeeting = async (req: Request, res: Response) => {
 const changeAttendanceStatus = async (
   userId: string,
   meeting: IMeeting,
-  newStatus: AttendanceStatus
+  newStatus: AttendanceStatus,
+  voting: boolean
 ) => {
   if (meeting.status === MeetingStatus.ADJOURNED) {
     throw {
@@ -222,6 +236,7 @@ const changeAttendanceStatus = async (
   }
 
   attendanceRecord.status = newStatus;
+  attendanceRecord.voting = voting;
 
   try {
     meeting = await meeting.save();
