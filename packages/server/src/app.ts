@@ -27,7 +27,8 @@ import {
 import { getUser, getUserByEmail, login, register } from './controllers/user';
 import {
   beginVotingProcedure,
-  endVotingProcedure
+  endVotingProcedure,
+  setVoteState
 } from './controllers/voting-record';
 
 const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
@@ -93,5 +94,6 @@ app.post('/motion', isAuthenticated, makeMotion);
 
 app.post('/voting/begin', isAuthenticated, beginVotingProcedure);
 app.post('/voting/end', isAuthenticated, endVotingProcedure);
+app.patch('/voting/vote', isAuthenticated, setVoteState);
 
 export default app;

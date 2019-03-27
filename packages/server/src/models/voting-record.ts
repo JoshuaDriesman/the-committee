@@ -60,7 +60,9 @@ export default VotingRecord;
 export const fetchVotingRecordById = async (votingRecordId: string) => {
   let votingRecord: IVotingRecord;
   try {
-    votingRecord = await VotingRecord.findById(votingRecordId);
+    votingRecord = await VotingRecord.findById(votingRecordId)
+      .populate('votes.member')
+      .exec();
   } catch (err) {
     throw {
       code: 500,

@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 
 import { fetchMeetingById, IMeeting, MeetingStatus } from '../models/meeting';
 import { fetchMotionById, IMotion, MotionStatus } from '../models/motion';
-import { createVotingRecordFromAttendanceRecord } from '../models/voting-record';
+import {
+  createVotingRecordFromAttendanceRecord,
+  VoteState,
+  fetchVotingRecordById
+} from '../models/voting-record';
 import { IVotingRecord } from '../models/voting-record';
 
 /**
@@ -113,6 +117,69 @@ export const endVotingProcedure = async (req: Request, res: Response) => {
     meeting = await meeting.save();
   } catch (err) {
     res.status(500).send('Could not save meeting with ended voting record.');
+  }
+
+  return res.send(meeting);
+};
+
+export const setVoteState = async (req: Request, res: Response) => {
+  req.assert('meetingId').notEmpty();
+  req
+    .assert('voteState')
+    .notEmpty()
+    .isString();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    return res.status(400).send(errors);
+  }
+
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.body.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  if (!meeting.activeVotingRecord) {
+    return res.status(400).send('No vote in progress for given meeting.');
+  }
+
+  let votingRecord: IVotingRecord;
+  try {
+    votingRecord = await fetchVotingRecordById(meeting.activeVotingRecord.id);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  const maybeVote = votingRecord.votes.filter(v => v.member.id === req.user.id);
+
+  if (maybeVote.length !== 1) {
+    return res.status(400).send('No voting record for user');
+  }
+
+  const voteStr = req.body.voteState;
+  let newVoteState: VoteState;
+  // Maybe there is a better way to do this, but this all needs refactoring anyways
+  if (voteStr === 'yes') {
+    newVoteState = VoteState.YES;
+  } else if (voteStr === 'no') {
+    newVoteState = VoteState.NO;
+  } else if (voteStr === 'abstain') {
+    newVoteState = VoteState.ABSTAIN;
+  } else {
+    return res
+      .status(400)
+      .send("Vote state must be one of 'yes', 'no', or 'abstain'");
+  }
+
+  maybeVote[0].voteState = newVoteState;
+
+  try {
+    await votingRecord.save();
+    meeting = await fetchMeetingById(meeting.id, true);
+  } catch (err) {
+    return res.status(500).send('Error saving new voting state');
   }
 
   return res.send(meeting);
