@@ -63,6 +63,17 @@ const DEFAULT_MOTIONS = [
     amendable: false,
     interrupts: true,
     votingType: VotingThreshold.NA
+  },
+  {
+    name: 'Motion to Adjourn',
+    motionType: MotionClass.INCIDENTAL,
+    description: 'Adjourn the meeting.',
+    precedence: 0,
+    requiresSecond: true,
+    debatable: Debatable.LIMITED,
+    amendable: false,
+    interrupts: false,
+    votingType: VotingThreshold.TWO_THIRDS
   }
 ];
 
