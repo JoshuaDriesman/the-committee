@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 
 import { fetchMeetingById, IMeeting, MeetingStatus } from '../models/meeting';
 import { fetchMotionById, IMotion, MotionStatus } from '../models/motion';
+import { VotingThreshold } from '../models/motion-type';
 import {
   createVotingRecordFromAttendanceRecord,
-  VoteState,
-  fetchVotingRecordById
+  fetchVotingRecordById,
+  VoteState
 } from '../models/voting-record';
 import { IVotingRecord } from '../models/voting-record';
 
@@ -58,10 +59,18 @@ export const beginVotingProcedure = async (req: Request, res: Response) => {
       .send('Can not vote on motion that is not actively pending.');
   }
 
-  const meetingMotionIds = meeting.pendingMotions.map(m => m.id);
-  if (!meetingMotionIds.includes(motion.id)) {
-    return res.status(400).send('Motion must be part of the current meeting.');
+  if (motion.motionType.votingType === VotingThreshold.NA) {
+    return res.status(400).send('Motion does not require a vote.');
   }
+
+  const currentTopMotion = meeting.pendingMotions.pop();
+  if (currentTopMotion.id !== motion.id) {
+    return res
+      .status(400)
+      .send('You can only vote on the top motion in the pending list');
+  }
+
+  meeting.pendingMotions.push(currentTopMotion);
 
   let votingRecord: IVotingRecord;
   try {
@@ -108,7 +117,53 @@ export const endVotingProcedure = async (req: Request, res: Response) => {
   }
 
   if (!meeting.activeVotingRecord) {
-    res.status(400).send('No active voting procedure for given meeting.');
+    return res
+      .status(400)
+      .send('No active voting procedure for given meeting.');
+  }
+
+  let votingRecord: IVotingRecord;
+  try {
+    votingRecord = await fetchVotingRecordById(meeting.activeVotingRecord.id);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  let motion: IMotion;
+  try {
+    motion = await fetchMotionById(votingRecord.motion.id);
+  } catch (err) {
+    res.status(500).send('Error getting motion.');
+  }
+
+  const totalVotes = votingRecord.votes.length;
+  const voteCounts = countVotes(votingRecord);
+  const checkVoteCounts = (threshold: number) => {
+    if (voteCounts.yes > threshold) {
+      return MotionStatus.ACCEPTED;
+    } else if (voteCounts.yes < threshold) {
+      return MotionStatus.REJECTED;
+    } else {
+      return MotionStatus.PENDING;
+    }
+  };
+
+  if (motion.motionType.votingType === VotingThreshold.MAJORITY) {
+    motion.motionStatus = checkVoteCounts(totalVotes / 2);
+  } else if (motion.motionType.votingType === VotingThreshold.TWO_THIRDS) {
+    motion.motionStatus = checkVoteCounts((totalVotes * 2) / 3);
+  }
+
+  try {
+    motion = await motion.save();
+  } catch (err) {
+    return res.status(500).send('Could not save updated motion');
+  }
+
+  // In the case none of the above is true (in a tie)
+  if (motion.motionStatus !== MotionStatus.PENDING) {
+    meeting.pendingMotions.pop();
+    meeting.motionHistory.push(motion);
   }
 
   meeting.activeVotingRecord = null;
@@ -183,4 +238,28 @@ export const setVoteState = async (req: Request, res: Response) => {
   }
 
   return res.send(meeting);
+};
+
+const countVotes = (votingRecord: IVotingRecord) => {
+  const countVotingTypes = (vt: VoteState) => {
+    return votingRecord.votes.reduce((count, vote) => {
+      if (vote.voteState === vt) {
+        return count + 1;
+      }
+      return count;
+    }, 0);
+  };
+
+  const no = countVotingTypes(VoteState.NO);
+
+  const yes = countVotingTypes(VoteState.YES);
+
+  const abstain =
+    countVotingTypes(VoteState.ABSTAIN) + countVotingTypes(VoteState.PENDING);
+
+  return {
+    no,
+    yes,
+    abstain
+  };
 };

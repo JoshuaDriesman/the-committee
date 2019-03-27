@@ -62,6 +62,7 @@ export const fetchVotingRecordById = async (votingRecordId: string) => {
   try {
     votingRecord = await VotingRecord.findById(votingRecordId)
       .populate('votes.member')
+      .populate('motion')
       .exec();
   } catch (err) {
     throw {
