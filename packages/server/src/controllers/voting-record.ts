@@ -15,7 +15,6 @@ import { IVotingRecord } from '../models/voting-record';
  */
 
 export const beginVotingProcedure = async (req: Request, res: Response) => {
-  req.assert('motionId').notEmpty();
   req.assert('meetingId').notEmpty();
 
   const errors = req.validationErrors();
@@ -46,12 +45,17 @@ export const beginVotingProcedure = async (req: Request, res: Response) => {
     return res.status(400).send('Meeting already has a vote in progress.');
   }
 
+  if (meeting.pendingMotions.length === 0) {
+    return res.status(400).send('No motions to vote on');
+  }
+
   let motion: IMotion;
   try {
-    motion = await fetchMotionById(req.body.motionId);
+    motion = await fetchMotionById(meeting.pendingMotions.pop().id);
   } catch (err) {
     return res.status(err.code).send(err.msg);
   }
+  meeting.pendingMotions.push(motion);
 
   if (motion.motionStatus !== MotionStatus.PENDING) {
     return res
@@ -62,15 +66,6 @@ export const beginVotingProcedure = async (req: Request, res: Response) => {
   if (motion.motionType.votingType === VotingThreshold.NA) {
     return res.status(400).send('Motion does not require a vote.');
   }
-
-  const currentTopMotion = meeting.pendingMotions.pop();
-  if (currentTopMotion.id !== motion.id) {
-    return res
-      .status(400)
-      .send('You can only vote on the top motion in the pending list');
-  }
-
-  meeting.pendingMotions.push(currentTopMotion);
 
   let votingRecord: IVotingRecord;
   try {
