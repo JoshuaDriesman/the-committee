@@ -66,7 +66,7 @@ const DEFAULT_MOTIONS = [
   },
   {
     name: 'Motion to Adjourn',
-    motionType: MotionClass.INCIDENTAL,
+    motionType: MotionClass.PRIVILEGED,
     description: 'Adjourn the meeting.',
     precedence: 0,
     requiresSecond: true,
