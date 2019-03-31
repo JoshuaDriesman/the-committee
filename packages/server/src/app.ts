@@ -25,7 +25,13 @@ import {
   getRoster,
   removeMemberByEmail
 } from './controllers/roster';
-import { getUser, getUserByEmail, login, register } from './controllers/user';
+import {
+  getCurrentUser,
+  getUser,
+  getUserByEmail,
+  login,
+  register
+} from './controllers/user';
 import {
   beginVotingProcedure,
   endVotingProcedure,
@@ -77,6 +83,7 @@ app.post('/user/register', register);
 app.post('/user/login', login);
 app.get('/user/:userId', isAuthenticated, getUser);
 app.get('/user/byEmail/:email', isAuthenticated, getUserByEmail);
+app.get('/user', isAuthenticated, getCurrentUser);
 
 app.post('/roster', isAuthenticated, createRoster);
 app.delete('/roster/:rosterId', isAuthenticated, deleteRoster);

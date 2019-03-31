@@ -113,3 +113,7 @@ export const getUserByEmail = async (req: Request, res: Response) => {
 
   return res.send(user);
 };
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+  return res.send(req.user);
+};
