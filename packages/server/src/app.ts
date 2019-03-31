@@ -11,6 +11,7 @@ import { isAuthenticated } from './utils/user-auth';
 import {
   adjournMeeting,
   getMeeting,
+  getMeetingsByMember,
   joinMeeting,
   leaveMeeting,
   startMeeting
@@ -115,6 +116,7 @@ app.get('/meeting/:meetingId', isAuthenticated, getMeeting);
 app.patch('/meeting/:meetingId/chair/adjourn', isAuthenticated, adjournMeeting);
 
 // Participant meeting endpoints
+app.get('/meetingByMember', isAuthenticated, getMeetingsByMember);
 app.patch('/meeting/:meetingId/participant/join', isAuthenticated, joinMeeting);
 app.patch(
   '/meeting/:meetingId/participant/leave',

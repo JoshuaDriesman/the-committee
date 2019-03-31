@@ -157,6 +157,19 @@ export const adjournMeeting = async (req: Request, res: Response) => {
 };
 
 // Participant endpoints.
+export const getMeetingsByMember = async (req: Request, res: Response) => {
+  let meetings: IMeeting[];
+  try {
+    meetings = await Meeting.find({
+      'attendanceRecords.member': req.user.id
+    });
+  } catch (err) {
+    return res.status(500).send('Error getting meetings');
+  }
+
+  return res.send(meetings);
+};
+
 export const joinMeeting = async (req: Request, res: Response) => {
   req
     .assert('voting')
