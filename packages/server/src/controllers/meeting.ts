@@ -73,7 +73,7 @@ export const startMeeting = async (req: Request, res: Response) => {
 
   let chair: IUser;
   try {
-    chair = await fetchUserById(req.user);
+    chair = await fetchUserById(req.user.id);
   } catch (err) {
     return res.status(err.resCode).send(err.error);
   }
