@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 import Login from './components/Login';
+import Home from './components/Home';
 import './App.css';
 
 const apiRoot = 'http://localhost:8080';
@@ -22,7 +23,9 @@ const App = () => (
     />
     <Route
       path="/home"
-      render={() => (authToken ? <p>Welcome</p> : <Redirect to="/login" />)}
+      render={props =>
+        authToken ? <Home config={config} /> : <Redirect to="/login" />
+      }
     />
   </Router>
 );

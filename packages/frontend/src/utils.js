@@ -2,12 +2,18 @@
  * Build a Request object.
  */
 
-export const buildRequest = (url, method, data) => {
+export const buildRequest = (url, method, data, token) => {
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return new Request(url, {
     method: method,
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    body: data && JSON.stringify(data),
+    headers
   });
 };
