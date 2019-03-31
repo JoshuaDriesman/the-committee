@@ -58,7 +58,7 @@ const Home = props => {
   const [user, setUser] = useState(undefined);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCurrentUser = async () => {
       const req = buildRequest(
         props.config.apiRoot + '/user',
         'GET',
@@ -72,7 +72,7 @@ const Home = props => {
       }
     };
     if (!user) {
-      fetchData();
+      fetchCurrentUser();
     }
   });
 
@@ -81,11 +81,32 @@ const Home = props => {
     flex-direction: column;
   `;
 
+  const handleStartMeeting = async () => {
+    const req = buildRequest(
+      props.config.apiRoot + '/meeting/start',
+      'POST',
+      {
+        name: 'Senate Meeting',
+        rosterId: '5ca11bd74ec0422d879f1568',
+        motionSetId: '5ca117f01e654d2c6c0dad21'
+      },
+      sessionStorage.getItem('auth')
+    );
+
+    const res = await fetch(req);
+
+    if (res.status === 200) {
+      console.log('success');
+    }
+  };
+
   return (
     <StyledPage>
       <HomeHeader user={user} routeHistory={props.history} />
-      {user && user.email === 'suchirarsharma@gmail.com' && (
-        <Button>Start Meeting</Button>
+      {user && user.email === 'suchirarsharma@gmail.com' ? (
+        <Button onClick={handleStartMeeting}>Start Meeting</Button>
+      ) : (
+        <p>HI</p>
       )}
     </StyledPage>
   );
