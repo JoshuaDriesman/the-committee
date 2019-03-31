@@ -54,8 +54,21 @@ const HomeHeader = props => {
   );
 };
 
+const MeetingList = props => {
+  const meetingRows = [];
+
+  if (props.meetings) {
+    props.meetings.forEach(meeting => {
+      meetingRows.push(<li key={meeting._id}>{meeting.name}</li>);
+    });
+  }
+
+  return <ul>{meetingRows}</ul>;
+};
+
 const Home = props => {
   const [user, setUser] = useState(undefined);
+  const [meetings, setMeetings] = useState(undefined);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -73,6 +86,23 @@ const Home = props => {
     };
     if (!user) {
       fetchCurrentUser();
+    }
+
+    const fetchUserMeetings = async () => {
+      const req = buildRequest(
+        props.config.apiRoot + '/meetingByMember',
+        'GET',
+        undefined,
+        sessionStorage.getItem('auth')
+      );
+      const res = await fetch(req);
+
+      if (res.status === 200) {
+        setMeetings(await res.json());
+      }
+    };
+    if (!meetings) {
+      fetchUserMeetings();
     }
   });
 
@@ -106,7 +136,7 @@ const Home = props => {
       {user && user.email === 'suchirarsharma@gmail.com' ? (
         <Button onClick={handleStartMeeting}>Start Meeting</Button>
       ) : (
-        <p>HI</p>
+        <MeetingList meetings={meetings} />
       )}
     </StyledPage>
   );
