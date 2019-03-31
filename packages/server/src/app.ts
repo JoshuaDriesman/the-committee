@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import express, { Request, Response } from 'express';
 import expressValidator from 'express-validator';
+import fs from 'fs';
 import mongoose from 'mongoose';
 
 import serverConfig from './config/server';
@@ -31,9 +32,22 @@ import {
   setVoteState
 } from './controllers/voting-record';
 
-const dbConn = mongoose.connect('mongodb://localhost/the-committee', {
-  useNewUrlParser: true
-});
+const pem: Readonly<string[]> = [
+  fs.readFileSync(process.env.CA_LOCATION, {
+    encoding: 'utf-8'
+  })
+];
+const dbHost = process.env.MONGO_HOST;
+const dbPwd = process.env.MONGO_PWD;
+
+const dbConn = mongoose.connect(
+  `mongodb://the-committee:${dbPwd}@${dbHost}/the-committee`,
+  {
+    useNewUrlParser: true,
+    ssl: true,
+    sslCA: pem
+  }
+);
 
 const app = express();
 
@@ -43,6 +57,17 @@ app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(expressValidator());
+
+app.use((req, res, next) => {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'content-type,authorization');
+
+  // Pass to next layer of middleware
+  next();
+});
 
 app.get('/', (req: Request, res: Response) => {
   res.send(`Up and running as of ${new Date().toISOString()}`);
