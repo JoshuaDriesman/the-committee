@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
-import Login from './components/Login';
-import Home from './components/Home';
+import Login from './views/Login';
+import Home from './views/Home';
 import './App.css';
 
 const apiRoot = 'http://localhost:8080';
