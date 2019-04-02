@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import { buildRequest } from '../utils';
+import Header from '../components/Header';
 
 class ChairMeeting extends React.Component {
   constructor(props) {
@@ -44,18 +45,41 @@ class ChairMeeting extends React.Component {
     clearInterval(this.state.intervalId);
   }
 
+  handleAdjourn = async () => {
+    const req = buildRequest(
+      this.props.config.apiRoot +
+        `/meeting/${this.state.meeting._id}/chair/adjourn`,
+      'PATCH',
+      undefined,
+      sessionStorage.getItem('auth')
+    );
+
+    const res = await fetch(req);
+
+    if (res.status === 200) {
+      sessionStorage.removeItem('meetingId');
+      this.props.history.push('/home');
+      this.props.history.goForward();
+    } else {
+      console.error(`Adjourn failed with code ${res.status}`);
+    }
+  };
+
   render() {
     if (this.state.meeting) {
       return (
         <div>
-          <h1>{this.state.meeting.name}</h1>
-          <Link to="/home">Bye</Link>
+          <Header
+            centerMessage={this.state.meeting.name}
+            buttonAction={this.handleAdjourn}
+            buttonText="Adjourn"
+          />
         </div>
       );
     } else {
-      return <h1>Meeting loading</h1>;
+      return <h1>Meeting loading, please standby</h1>;
     }
   }
 }
 
-export default ChairMeeting;
+export default withRouter(ChairMeeting);

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
@@ -44,6 +45,12 @@ const Header = props => {
       </StyledButtonWrapper>
     </StyledAppBar>
   );
+};
+
+Header.propTypes = {
+  centerMessage: PropTypes.string,
+  buttonAction: PropTypes.func,
+  buttonText: PropTypes.string
 };
 
 export default Header;
