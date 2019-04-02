@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import styled from '@emotion/styled';
 import { withRouter } from 'react-router-dom';
 
-import ErrorSnackbar from './ErrorSnackbar';
+import ErrorSnackbar from '../components/ErrorSnackbar';
 import { buildRequest } from '../utils';
 
 const StyledPaper = styled(Paper)`
