@@ -127,6 +127,10 @@ const Home = props => {
 
     if (res.status === 200) {
       console.log('success');
+      const meetingData = await res.json();
+      sessionStorage.setItem('meetingId', meetingData._id);
+      props.history.push('/chairMeeting');
+      props.history.goForward();
     }
   };
 

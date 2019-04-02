@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 import Login from './views/Login';
 import Home from './views/Home';
+import ChairMeeting from './views/ChairMeeting';
 import './App.css';
 
 const apiRoot = 'http://localhost:8080';
@@ -25,6 +26,12 @@ const App = () => (
       path="/home"
       render={props =>
         authToken ? <Home config={config} /> : <Redirect to="/login" />
+      }
+    />
+    <Route
+      path="/chairMeeting"
+      render={props =>
+        authToken ? <ChairMeeting config={config} /> : <Redirect to="/login" />
       }
     />
   </Router>
