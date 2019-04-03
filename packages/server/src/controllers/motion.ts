@@ -156,15 +156,21 @@ export const makeMotion = async (req: Request, res: Response) => {
       return res.status(500).send('Could not get full pending motion.');
     }
 
+    const precedenceCompResult = compareMotionPrecedence(
+      motion,
+      fullPendingMotion
+    );
     if (
-      compareMotionPrecedence(motion, fullPendingMotion) < 1 &&
-      motion.motionType.name !== 'Motion to Amend' // This is super hacky and should not be done, see bug #5
+      motion.motionType.name !== 'Motion to Amend' &&
+      precedenceCompResult !== 0 // This is super hacky and should not be done, see issue #5
     ) {
-      return res
-        .status(400)
-        .send(
-          'Motion is out of order. The motion currently on the floor is of higher or the same precedence.'
-        );
+      if (precedenceCompResult < 1) {
+        return res
+          .status(400)
+          .send(
+            'Motion is out of order. The motion currently on the floor is of higher or the same precedence.'
+          );
+      }
     }
   }
 
