@@ -156,15 +156,26 @@ export const makeMotion = async (req: Request, res: Response) => {
       return res.status(500).send('Could not get full pending motion.');
     }
 
+    if (motion.effects.id !== fullPendingMotion.id) {
+      return res
+        .status(400)
+        .send('Only the current motion the floor can be effected.');
+    }
+
     const precedenceCompResult = compareMotionPrecedence(
       motion,
       fullPendingMotion
     );
-    if (
-      motion.motionType.name !== 'Motion to Amend' &&
-      precedenceCompResult !== 0 // This is super hacky and should not be done, see issue #5
-    ) {
+    if (motion.motionType.name !== 'Motion to Amend') {
       if (precedenceCompResult < 1) {
+        return res
+          .status(400)
+          .send(
+            'Motion is out of order. The motion currently on the floor is of higher or the same precedence.'
+          );
+      }
+    } else {
+      if (precedenceCompResult < 0) {
         return res
           .status(400)
           .send(
