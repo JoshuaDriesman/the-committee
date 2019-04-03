@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import { AttendanceRecordSchema, IAttendanceRecord } from './attendance-record';
-import { IMotion } from './motion';
+import { IMotion, fetchMotionById } from './motion';
 import { IMotionSet } from './motion-set';
 import { IUser } from './user';
 import { IVotingRecord } from './voting-record';
@@ -78,7 +78,6 @@ export const fetchMeetingById = async (
     if (populate) {
       meeting = await Meeting.findById(meetingId)
         .populate('motionSet')
-        .populate('pendingMotions')
         .populate('motionHistory')
         .populate('motionQueue')
         .populate('activeVotingRecord')
@@ -88,6 +87,12 @@ export const fetchMeetingById = async (
     } else {
       meeting = await Meeting.findById(meetingId);
     }
+
+    meeting.pendingMotions = await Promise.all(
+      meeting.pendingMotions.map(
+        async m => await fetchMotionById((m as unknown) as string)
+      )
+    );
   } catch (err) {
     throw {
       msg: `Error getting meeting with ID ${meetingId}`,

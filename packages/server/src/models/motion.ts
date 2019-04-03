@@ -53,6 +53,7 @@ export const fetchMotionById = async (motionId: string) => {
   try {
     motion = await Motion.findById(motionId)
       .populate('motionType')
+      .populate('owner')
       .exec();
   } catch (err) {
     throw {

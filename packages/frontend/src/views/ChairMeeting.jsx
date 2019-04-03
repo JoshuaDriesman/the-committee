@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 import { buildRequest } from '../utils';
 import Header from '../components/Header';
+import MotionList from '../components/MotionList';
 
 class ChairMeeting extends React.Component {
   constructor(props) {
@@ -73,6 +74,11 @@ class ChairMeeting extends React.Component {
             centerMessage={this.state.meeting.name}
             buttonAction={this.handleAdjourn}
             buttonText="Adjourn"
+          />
+          <MotionList
+            showStatus
+            motions={this.state.meeting.pendingMotions}
+            config={this.props.config}
           />
         </div>
       );

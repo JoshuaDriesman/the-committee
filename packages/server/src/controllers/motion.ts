@@ -235,3 +235,14 @@ const compareMotionPrecedence = (m1: IMotion, m2: IMotion) => {
 
   return 1;
 };
+
+export const getMotion = async (req: Request, res: Response) => {
+  let motion: IMotion;
+  try {
+    motion = await fetchMotionById(req.params.motionId);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  return res.send(motion);
+};
