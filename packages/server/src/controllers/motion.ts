@@ -9,7 +9,7 @@ import Motion, {
 } from '../models/motion';
 import { IMotionSet } from '../models/motion-set';
 import { fetchMotionSetById } from '../models/motion-set';
-import { IMotionType, MotionClass } from '../models/motion-type';
+import MotionType, { IMotionType, MotionClass } from '../models/motion-type';
 import { fetchMotionTypeById } from '../models/motion-type';
 import { fetchUserById, IUser } from '../models/user';
 
@@ -156,7 +156,10 @@ export const makeMotion = async (req: Request, res: Response) => {
       return res.status(500).send('Could not get full pending motion.');
     }
 
-    if (compareMotionPrecedence(motion, fullPendingMotion) < 1) {
+    if (
+      compareMotionPrecedence(motion, fullPendingMotion) < 1 &&
+      motion.motionType.name !== 'Motion to Amend' // This is super hacky and should not be done, see bug #5
+    ) {
       return res
         .status(400)
         .send(
