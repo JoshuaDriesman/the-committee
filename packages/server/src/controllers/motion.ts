@@ -100,7 +100,8 @@ export const makeMotion = async (req: Request, res: Response) => {
       motionType.motionType === MotionClass.INCIDENTAL
         ? MotionStatus.ACCEPTED
         : MotionStatus.PENDING,
-    dateTimeMade: new Date()
+    dateTimeMade: new Date(),
+    userFriendlyId: meeting.pendingMotions.length + 1
   });
 
   if (req.body.effectId) {
@@ -156,7 +157,7 @@ export const makeMotion = async (req: Request, res: Response) => {
       return res.status(500).send('Could not get full pending motion.');
     }
 
-    if (motion.effects.id !== fullPendingMotion.id) {
+    if (motion.effects && motion.effects.id !== fullPendingMotion.id) {
       return res
         .status(400)
         .send('Only the current motion the floor can be effected.');

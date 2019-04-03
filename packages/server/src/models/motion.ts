@@ -17,6 +17,7 @@ export interface IMotion extends mongoose.Document {
   owner: IUser;
   motionStatus: MotionStatus;
   dateTimeMade: Date;
+  userFriendlyId: number;
   secondedBy?: IUser;
   effects?: IMotion;
 }
@@ -39,6 +40,7 @@ export const MotionSchema = new mongoose.Schema({
     ]
   },
   dateTimeMade: { type: Date, required: true },
+  userFriendlyId: { type: Number, required: true }, // Only unique within meetings
   secondedBy: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User'

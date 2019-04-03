@@ -28,6 +28,7 @@ const MotionList = props => {
   props.motions.forEach(motion => {
     const row = (
       <TableRow key={motion._id}>
+        <TableCell>{motion.userFriendlyId}</TableCell>
         <TableCell>{motion.motionType.name}</TableCell>
         <TableCell>
           {motion.motionType.motionType.charAt(0).toUpperCase() +
@@ -54,6 +55,7 @@ const MotionList = props => {
     <Table>
       <TableHead>
         <TableRow>
+          <TableCell>ID</TableCell>
           <TableCell>Motion</TableCell>
           <TableCell>Type</TableCell>
           <TableCell>Made By</TableCell>
