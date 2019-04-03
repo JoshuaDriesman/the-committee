@@ -37,7 +37,7 @@ const MotionList = props => {
         <TableCell>
           {moment(motion.dateTimeMade)
             .local()
-            .toString()}
+            .format('hh:mm:ss a')}
         </TableCell>
         {props.showStatus && (
           <TableCell>{statusToCode(motion.motionStatus)}</TableCell>
