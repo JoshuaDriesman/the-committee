@@ -8,6 +8,7 @@ import {
   TableCell,
   TableBody
 } from '@material-ui/core';
+import moment from 'moment';
 
 const statusToCode = status => {
   switch (status) {
@@ -33,7 +34,11 @@ const MotionList = props => {
             motion.motionType.motionType.slice(1)}
         </TableCell>
         <TableCell>{motion.owner.lastName}</TableCell>
-        <TableCell>Need to add</TableCell>
+        <TableCell>
+          {moment(motion.dateTimeMade)
+            .local()
+            .toString()}
+        </TableCell>
         {props.showStatus && (
           <TableCell>{statusToCode(motion.motionStatus)}</TableCell>
         )}
@@ -42,6 +47,8 @@ const MotionList = props => {
 
     motionRows.push(row);
   });
+
+  motionRows = motionRows.reverse();
 
   return (
     <Table>

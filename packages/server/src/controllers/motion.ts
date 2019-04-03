@@ -99,7 +99,8 @@ export const makeMotion = async (req: Request, res: Response) => {
     motionStatus:
       motionType.motionType === MotionClass.INCIDENTAL
         ? MotionStatus.ACCEPTED
-        : MotionStatus.PENDING
+        : MotionStatus.PENDING,
+    dateTimeMade: new Date()
   });
 
   if (req.body.effectId) {
