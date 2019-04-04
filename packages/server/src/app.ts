@@ -16,7 +16,7 @@ import {
   leaveMeeting,
   startMeeting
 } from './controllers/meeting';
-import { getMotion, makeMotion } from './controllers/motion';
+import { getMotion, makeMotion, withdrawMotion } from './controllers/motion';
 import { generateDefaultMotionTypes } from './controllers/motion-set';
 import { getMotionTypeForUser } from './controllers/motion-type';
 import {
@@ -128,6 +128,7 @@ app.patch(
 
 app.post('/motion', isAuthenticated, makeMotion);
 app.get('/motion/:motionId', isAuthenticated, getMotion);
+app.patch('/motion/:motionId/withdraw', isAuthenticated, withdrawMotion);
 
 app.post('/voting/begin', isAuthenticated, beginVotingProcedure);
 app.post('/voting/end', isAuthenticated, endVotingProcedure);

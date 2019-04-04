@@ -93,6 +93,12 @@ export const fetchMeetingById = async (
         async m => await fetchMotionById((m as unknown) as string)
       )
     );
+
+    meeting.motionHistory = await Promise.all(
+      meeting.motionHistory.map(
+        async m => await fetchMotionById((m as unknown) as string)
+      )
+    );
   } catch (err) {
     throw {
       msg: `Error getting meeting with ID ${meetingId}`,

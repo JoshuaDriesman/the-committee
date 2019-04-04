@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import authConfig from '../config/auth';
-import User, { IUser, fetchUserById } from '../models/user';
+import User, { fetchUserById, IUser } from '../models/user';
 
 const generateToken = (user: IUser): string => {
   return jwt.sign({ id: user.id }, authConfig.secretToken, {

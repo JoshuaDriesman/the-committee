@@ -10,7 +10,8 @@ export enum MotionStatus {
   TABLED = 'tabled',
   PENDING = 'pending',
   ACCEPTED = 'accepted',
-  REJECTED = 'rejected'
+  REJECTED = 'rejected',
+  WITHDRAWN = 'withdrawn'
 }
 export interface IMotion extends mongoose.Document {
   motionType: IMotionType;
@@ -18,6 +19,7 @@ export interface IMotion extends mongoose.Document {
   motionStatus: MotionStatus;
   dateTimeMade: Date;
   userFriendlyId: number;
+  userFriendlyName: string;
   secondedBy?: IUser;
   effects?: IMotion;
 }
@@ -36,11 +38,13 @@ export const MotionSchema = new mongoose.Schema({
       MotionStatus.ACCEPTED,
       MotionStatus.PENDING,
       MotionStatus.REJECTED,
-      MotionStatus.TABLED
+      MotionStatus.TABLED,
+      MotionStatus.WITHDRAWN
     ]
   },
   dateTimeMade: { type: Date, required: true },
   userFriendlyId: { type: Number, required: true }, // Only unique within meetings
+  userFriendlyName: String,
   secondedBy: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User'

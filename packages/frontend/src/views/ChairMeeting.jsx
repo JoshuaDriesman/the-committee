@@ -2,9 +2,15 @@ import React from 'react';
 
 import { withRouter } from 'react-router-dom';
 
+import styled from '@emotion/styled';
+
 import { buildRequest } from '../utils';
 import Header from '../components/Header';
 import MotionList from '../components/MotionList';
+
+const Row = styled.div`
+  display: flex;
+`;
 
 class ChairMeeting extends React.Component {
   constructor(props) {
@@ -75,11 +81,24 @@ class ChairMeeting extends React.Component {
             buttonAction={this.handleAdjourn}
             buttonText="Adjourn"
           />
-          <MotionList
-            showStatus
-            motions={this.state.meeting.pendingMotions}
-            config={this.props.config}
-          />
+          <div>
+            <Row>
+              <div>Current Motion</div>
+              <div>Make Motion</div>
+              <div>Roster</div>
+            </Row>
+            <Row>
+              <MotionList
+                motions={this.state.meeting.pendingMotions}
+                config={this.props.config}
+              />
+              <MotionList
+                showStatus
+                motions={this.state.meeting.motionHistory}
+                config={this.props.config}
+              />
+            </Row>
+          </div>
         </div>
       );
     } else {

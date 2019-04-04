@@ -18,6 +18,8 @@ const statusToCode = status => {
       return 'A';
     case 'rejected':
       return 'R';
+    case 'withdrawn':
+      return 'W';
     default:
       return 'P'; // for pending
   }
@@ -28,7 +30,7 @@ const MotionList = props => {
   props.motions.forEach(motion => {
     const row = (
       <TableRow key={motion._id}>
-        <TableCell>{motion.userFriendlyId}</TableCell>
+        <TableCell>{motion.userFriendlyName}</TableCell>
         <TableCell>{motion.motionType.name}</TableCell>
         <TableCell>
           {motion.motionType.motionType.charAt(0).toUpperCase() +
@@ -55,9 +57,9 @@ const MotionList = props => {
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell>ID</TableCell>
-          <TableCell>Motion</TableCell>
-          <TableCell>Type</TableCell>
+          <TableCell>Name</TableCell>
+          <TableCell>Motion Type</TableCell>
+          <TableCell>Motion Class</TableCell>
           <TableCell>Made By</TableCell>
           <TableCell>Made At</TableCell>
           {props.showStatus && <TableCell>Status</TableCell>}

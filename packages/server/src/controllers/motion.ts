@@ -101,7 +101,8 @@ export const makeMotion = async (req: Request, res: Response) => {
         ? MotionStatus.ACCEPTED
         : MotionStatus.PENDING,
     dateTimeMade: new Date(),
-    userFriendlyId: meeting.pendingMotions.length + 1
+    userFriendlyId: meeting.pendingMotions.length + 1,
+    userFriendlyName: req.body.userFriendlyName
   });
 
   if (req.body.effectId) {
@@ -267,4 +268,59 @@ export const getMotion = async (req: Request, res: Response) => {
   }
 
   return res.send(motion);
+};
+
+export const withdrawMotion = async (req: Request, res: Response) => {
+  req.assert('meetingId', 'A meeting ID is required').notEmpty();
+
+  const errors = req.validationErrors();
+  if (errors) {
+    return res.status(400).send(errors);
+  }
+
+  let meeting: IMeeting;
+  try {
+    meeting = await fetchMeetingById(req.body.meetingId, true);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  if (req.user.id !== meeting.chair.id) {
+    return res.status(403).send('Must be chair to withdraw motion');
+  }
+
+  let motion: IMotion;
+  try {
+    motion = await fetchMotionById(req.params.motionId);
+  } catch (err) {
+    return res.status(err.code).send(err.msg);
+  }
+
+  const motionIds = meeting.pendingMotions.map(m => m.id);
+  if (
+    !motionIds.includes(motion.id) ||
+    motion.motionStatus !== MotionStatus.PENDING
+  ) {
+    return res.status(400).send('Motion must be pending.');
+  }
+
+  motion.motionStatus = MotionStatus.WITHDRAWN;
+  try {
+    motion = await motion.save();
+  } catch (err) {
+    return res.status(500).send('Failed to save updated motion');
+  }
+
+  meeting.pendingMotions = meeting.pendingMotions.filter(
+    m => m.id !== motion.id
+  );
+  meeting.motionHistory.push(motion);
+
+  try {
+    meeting = await meeting.save();
+  } catch (err) {
+    return res.status(500).send('Error saving updated meeting');
+  }
+
+  return res.status(200).send(true);
 };
