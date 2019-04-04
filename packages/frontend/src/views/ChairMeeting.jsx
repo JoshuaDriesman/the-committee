@@ -11,6 +11,7 @@ import CurrentMotion from '../components/CurrentMotion';
 import Section from '../components/Section';
 import ErrorSnackbar from '../components/ErrorSnackbar';
 import ParticipantList from '../components/ParticipantList';
+import MakeMotion from '../components/MakeMotion';
 
 const Row = styled.div`
   display: flex;
@@ -35,7 +36,12 @@ const StyledMeetingHistory = styled(Section)`
 class ChairMeeting extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { meeting: null, intervalId: null, error: '' };
+    this.state = {
+      meeting: null,
+      intervalId: null,
+      motionTypes: null,
+      error: ''
+    };
   }
 
   componentDidMount() {
@@ -70,6 +76,27 @@ class ChairMeeting extends React.Component {
 
       this.setState({ intervalId: setInterval(getMeetingData, 1000) });
     }
+
+    if (!this.state.motionTypes) {
+      const getMotionTypes = async () => {
+        const req = buildRequest(
+          this.props.config.apiRoot + '/motionType',
+          'GET',
+          undefined,
+          sessionStorage.getItem('auth')
+        );
+
+        const res = await fetch(req);
+
+        if (res.status !== 200) {
+          console.error(`Could not get motion types, status is ${res.status}`);
+        } else {
+          this.setState({ motionTypes: await res.json() });
+        }
+      };
+
+      getMotionTypes();
+    }
   }
 
   componentWillUnmount() {
@@ -102,6 +129,9 @@ class ChairMeeting extends React.Component {
 
   render() {
     if (this.state.meeting) {
+      const members = this.state.meeting.attendanceRecords
+        .filter(ar => ar.status === 'present')
+        .map(ar => ar.member);
       const pendingMotionsLength = this.state.meeting.pendingMotions.length;
       return (
         <div>
@@ -123,7 +153,16 @@ class ChairMeeting extends React.Component {
                 />
               </StyledTopSection>
               <StyledTopSection title="Make Motion" indent>
-                Make Motion
+                <MakeMotion
+                  motionTypes={this.state.motionTypes}
+                  members={members}
+                  config={this.props.config}
+                  setError={this.setError}
+                  currentMotion={
+                    pendingMotionsLength > 0 &&
+                    this.state.meeting.pendingMotions[pendingMotionsLength - 1]
+                  }
+                />
               </StyledTopSection>
               <StyledParticipantSection title="Participants">
                 <ParticipantList
