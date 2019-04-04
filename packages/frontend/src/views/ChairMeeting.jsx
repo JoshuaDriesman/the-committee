@@ -151,6 +151,7 @@ class ChairMeeting extends React.Component {
                   config={this.props.config}
                   votingRecord={this.state.meeting.activeVotingRecord}
                   setError={this.setError}
+                  participant={false}
                 />
               </StyledTopSection>
               <StyledTopSection title="Make Motion" indent>

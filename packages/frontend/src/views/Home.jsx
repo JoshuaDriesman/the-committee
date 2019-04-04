@@ -8,18 +8,6 @@ import { withRouter } from 'react-router-dom';
 import { buildRequest } from '../utils';
 import Header from '../components/Header';
 
-const MeetingList = props => {
-  const meetingRows = [];
-
-  if (props.meetings) {
-    props.meetings.forEach(meeting => {
-      meetingRows.push(<li key={meeting._id}>{meeting.name}</li>);
-    });
-  }
-
-  return <ul>{meetingRows}</ul>;
-};
-
 const Home = props => {
   const [user, setUser] = useState(undefined);
   const [meetings, setMeetings] = useState(undefined);
@@ -52,7 +40,8 @@ const Home = props => {
       const res = await fetch(req);
 
       if (res.status === 200) {
-        setMeetings(await res.json());
+        const meetings = await res.json();
+        setMeetings(meetings.filter(m => m.status === 'in-progress'));
       }
     };
     if (!meetings) {
@@ -88,6 +77,27 @@ const Home = props => {
     }
   };
 
+  const handleJoinMeeting = async () => {
+    const req = buildRequest(
+      props.config.apiRoot + `/meeting/${meetings[0]._id}/participant/join`,
+      'PATCH',
+      {
+        voting: true
+      },
+      sessionStorage.getItem('auth')
+    );
+
+    const res = await fetch(req);
+
+    if (res.status === 200) {
+      console.log('success');
+      const meetingData = await res.json();
+      sessionStorage.setItem('meetingId', meetingData._id);
+      props.history.push('/memberMeeting');
+      props.history.goForward();
+    }
+  };
+
   const onLogout = () => {
     sessionStorage.clear();
     props.history.replace('/login');
@@ -103,7 +113,7 @@ const Home = props => {
       {user && user.email === 'suchirarsharma@gmail.com' ? (
         <Button onClick={handleStartMeeting}>Start Meeting</Button>
       ) : (
-        <MeetingList meetings={meetings} />
+        <Button onClick={handleJoinMeeting}>Join Meeting</Button>
       )}
     </StyledPage>
   );

@@ -88,6 +88,7 @@ const CurrentMotion = props => {
           : 'N/A'}
       </p>
       {props.motion &&
+        !props.participant &&
         (!props.votingRecord ? (
           <StyledButtonSection>
             <StyledButton onClick={handleWithdraw}>Withdraw</StyledButton>
@@ -136,6 +137,7 @@ const CurrentMotion = props => {
 
 CurrentMotion.propTypes = {
   votingRecord: PropTypes.object,
+  participant: PropTypes.bool,
   motion: PropTypes.any
 };
 

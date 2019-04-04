@@ -17,7 +17,10 @@ import {
   startMeeting
 } from './controllers/meeting';
 import { getMotion, makeMotion, withdrawMotion } from './controllers/motion';
-import { generateDefaultMotionTypes } from './controllers/motion-set';
+import {
+  generateDefaultMotionTypes,
+  getMotionSet
+} from './controllers/motion-set';
 import { getMotionTypeForUser } from './controllers/motion-type';
 import {
   addMemberByEmail,
@@ -109,6 +112,7 @@ app.post(
   isAuthenticated,
   generateDefaultMotionTypes
 );
+app.get('/motionSet/:motionSetId', isAuthenticated, getMotionSet);
 
 // General meeting endpoints
 app.post('/meeting/start', isAuthenticated, startMeeting);

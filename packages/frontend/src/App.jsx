@@ -5,6 +5,7 @@ import Login from './views/Login';
 import Home from './views/Home';
 import ChairMeeting from './views/ChairMeeting';
 import './App.css';
+import MemberMeeting from './views/MemberMeeting';
 
 const apiRoot = 'http://localhost:8080';
 const mode = 'DEV';
@@ -32,6 +33,12 @@ const App = () => (
       path="/chairMeeting"
       render={props =>
         authToken ? <ChairMeeting config={config} /> : <Redirect to="/login" />
+      }
+    />
+    <Route
+      path="/memberMeeting"
+      render={props =>
+        authToken ? <MemberMeeting config={config} /> : <Redirect to="/login" />
       }
     />
   </Router>
