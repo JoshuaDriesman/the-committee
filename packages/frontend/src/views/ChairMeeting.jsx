@@ -42,7 +42,11 @@ class ChairMeeting extends React.Component {
 
         if (response.status === 200) {
           const meetingData = await response.json();
-          this.setState({ meeting: meetingData });
+          if (
+            JSON.stringify(this.state.meeting) !== JSON.stringify(meetingData)
+          ) {
+            this.setState({ meeting: meetingData });
+          }
         } else {
           console.error(`Meeting request returned with ${response.status}`);
         }
