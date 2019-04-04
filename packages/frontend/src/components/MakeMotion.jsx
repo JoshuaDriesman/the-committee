@@ -58,6 +58,8 @@ const MakeMotion = props => {
       return props.setError('All fields are required to make motion');
     }
 
+    const motionTypeDetails = getMotionTypeDetailsById(motionType);
+
     const req = buildRequest(
       props.config.apiRoot + '/motion',
       'POST',
@@ -66,7 +68,10 @@ const MakeMotion = props => {
         ownerId: madeBy,
         meetingId: sessionStorage.getItem('meetingId'),
         secondedById: secondedBy !== '' ? secondedBy : undefined,
-        effectId: props.currentMotion ? props.currentMotion._id : undefined,
+        effectId:
+          props.currentMotion && motionTypeDetails.motionType === 'subsidiary'
+            ? props.currentMotion._id
+            : undefined,
         userFriendlyName: name
       },
       sessionStorage.getItem('auth')
