@@ -9,6 +9,7 @@ import Header from '../components/Header';
 import MotionList from '../components/MotionList';
 import CurrentMotion from '../components/CurrentMotion';
 import Section from '../components/Section';
+import ErrorSnackbar from '../components/ErrorSnackbar';
 
 const Row = styled.div`
   display: flex;
@@ -21,7 +22,7 @@ const StyledTopSection = styled(Section)`
 class ChairMeeting extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { meeting: null, intervalId: null };
+    this.state = { meeting: null, intervalId: null, error: '' };
   }
 
   componentDidMount() {
@@ -62,6 +63,10 @@ class ChairMeeting extends React.Component {
     clearInterval(this.state.intervalId);
   }
 
+  setError = error => {
+    this.setState({ error });
+  };
+
   handleAdjourn = async () => {
     const req = buildRequest(
       this.props.config.apiRoot +
@@ -100,6 +105,8 @@ class ChairMeeting extends React.Component {
                     pendingMotionsLength > 0 &&
                     this.state.meeting.pendingMotions[pendingMotionsLength - 1]
                   }
+                  config={this.props.config}
+                  setError={this.setError}
                 />
               </StyledTopSection>
               <StyledTopSection title="Make Motion" indent>
@@ -125,6 +132,7 @@ class ChairMeeting extends React.Component {
                 />
               </Section>
             </Row>
+            <ErrorSnackbar error={this.state.error} setError={this.setError} />
           </div>
         </div>
       );
