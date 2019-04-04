@@ -134,7 +134,10 @@ export const endVotingProcedure = async (req: Request, res: Response) => {
   const totalVotes = votingRecord.votes.length;
   const voteCounts = countVotes(votingRecord);
   const checkVoteCounts = (threshold: number) => {
-    if (voteCounts.yes > threshold) {
+    if (voteCounts.yes === threshold && voteCounts.no === threshold) {
+      return MotionStatus.PENDING;
+    }
+    if (voteCounts.yes >= threshold) {
       return MotionStatus.ACCEPTED;
     } else if (voteCounts.yes < threshold) {
       return MotionStatus.REJECTED;
@@ -144,9 +147,9 @@ export const endVotingProcedure = async (req: Request, res: Response) => {
   };
 
   if (motion.motionType.votingType === VotingThreshold.MAJORITY) {
-    motion.motionStatus = checkVoteCounts(totalVotes / 2);
+    motion.motionStatus = checkVoteCounts(Math.ceil(totalVotes / 2));
   } else if (motion.motionType.votingType === VotingThreshold.TWO_THIRDS) {
-    motion.motionStatus = checkVoteCounts((totalVotes * 2) / 3);
+    motion.motionStatus = checkVoteCounts(Math.ceil((totalVotes * 2) / 3));
   }
 
   try {
