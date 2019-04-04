@@ -24,6 +24,14 @@ const StyledTopSection = styled(Section)`
 const StyledParticipantSection = styled(Section)`
   flex: 0.4;
 `;
+
+const StyledPendingMotions = styled(Section)`
+  flex: 0.44;
+`;
+
+const StyledMeetingHistory = styled(Section)`
+  flex: 0.56;
+`;
 class ChairMeeting extends React.Component {
   constructor(props) {
     super(props);
@@ -124,7 +132,7 @@ class ChairMeeting extends React.Component {
               </StyledParticipantSection>
             </Row>
             <Row>
-              <Section title="Pending Motions">
+              <StyledPendingMotions title="Pending Motions">
                 <MotionList
                   motions={this.state.meeting.pendingMotions.slice(
                     0,
@@ -132,14 +140,14 @@ class ChairMeeting extends React.Component {
                   )}
                   config={this.props.config}
                 />
-              </Section>
-              <Section title="Meeting History">
+              </StyledPendingMotions>
+              <StyledMeetingHistory title="Meeting History">
                 <MotionList
                   showStatus
                   motions={this.state.meeting.motionHistory}
                   config={this.props.config}
                 />
-              </Section>
+              </StyledMeetingHistory>
             </Row>
             <ErrorSnackbar error={this.state.error} setError={this.setError} />
           </div>
