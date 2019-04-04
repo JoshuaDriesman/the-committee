@@ -10,6 +10,7 @@ import MotionList from '../components/MotionList';
 import CurrentMotion from '../components/CurrentMotion';
 import Section from '../components/Section';
 import ErrorSnackbar from '../components/ErrorSnackbar';
+import ParticipantList from '../components/ParticipantList';
 
 const Row = styled.div`
   display: flex;
@@ -17,7 +18,11 @@ const Row = styled.div`
 `;
 
 const StyledTopSection = styled(Section)`
-  flex: 0.33;
+  flex: 0.3;
+`;
+
+const StyledParticipantSection = styled(Section)`
+  flex: 0.4;
 `;
 class ChairMeeting extends React.Component {
   constructor(props) {
@@ -112,7 +117,11 @@ class ChairMeeting extends React.Component {
               <StyledTopSection title="Make Motion" indent>
                 Make Motion
               </StyledTopSection>
-              <StyledTopSection title="Roster">Roster</StyledTopSection>
+              <StyledParticipantSection title="Participants">
+                <ParticipantList
+                  attendanceRecords={this.state.meeting.attendanceRecords}
+                />
+              </StyledParticipantSection>
             </Row>
             <Row>
               <Section title="Pending Motions">
