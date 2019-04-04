@@ -7,11 +7,17 @@ import styled from '@emotion/styled';
 import { buildRequest } from '../utils';
 import Header from '../components/Header';
 import MotionList from '../components/MotionList';
+import CurrentMotion from '../components/CurrentMotion';
+import Section from '../components/Section';
 
 const Row = styled.div`
   display: flex;
+  flex-direction: row;
 `;
 
+const StyledTopSection = styled(Section)`
+  flex: 0.33;
+`;
 class ChairMeeting extends React.Component {
   constructor(props) {
     super(props);
@@ -74,6 +80,7 @@ class ChairMeeting extends React.Component {
 
   render() {
     if (this.state.meeting) {
+      const pendingMotionsLength = this.state.meeting.pendingMotions.length;
       return (
         <div>
           <Header
@@ -83,20 +90,36 @@ class ChairMeeting extends React.Component {
           />
           <div>
             <Row>
-              <div>Current Motion</div>
-              <div>Make Motion</div>
-              <div>Roster</div>
+              <StyledTopSection title="Current Motion" indent>
+                <CurrentMotion
+                  motion={
+                    pendingMotionsLength > 0 &&
+                    this.state.meeting.pendingMotions[pendingMotionsLength - 1]
+                  }
+                />
+              </StyledTopSection>
+              <StyledTopSection title="Make Motion" indent>
+                Make Motion
+              </StyledTopSection>
+              <StyledTopSection title="Roster">Roster</StyledTopSection>
             </Row>
             <Row>
-              <MotionList
-                motions={this.state.meeting.pendingMotions}
-                config={this.props.config}
-              />
-              <MotionList
-                showStatus
-                motions={this.state.meeting.motionHistory}
-                config={this.props.config}
-              />
+              <Section title="Pending Motions">
+                <MotionList
+                  motions={this.state.meeting.pendingMotions.slice(
+                    0,
+                    pendingMotionsLength - 1
+                  )}
+                  config={this.props.config}
+                />
+              </Section>
+              <Section title="Meeting History">
+                <MotionList
+                  showStatus
+                  motions={this.state.meeting.motionHistory}
+                  config={this.props.config}
+                />
+              </Section>
             </Row>
           </div>
         </div>

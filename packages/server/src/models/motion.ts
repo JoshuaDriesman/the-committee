@@ -62,6 +62,7 @@ export const fetchMotionById = async (motionId: string) => {
     motion = await Motion.findById(motionId)
       .populate('motionType')
       .populate('owner')
+      .populate('secondedBy')
       .exec();
   } catch (err) {
     throw {
