@@ -55,10 +55,7 @@ const MakeMotion = props => {
 
   const handleSubmit = async () => {
     if (motionType === '' || madeBy === '' || name === '') {
-      props.setError('All fields are required to make motion');
-    }
-    if (requiresSecond && secondedBy === '') {
-      props.setError('Must select a second for this motion type');
+      return props.setError('All fields are required to make motion');
     }
 
     const req = buildRequest(
@@ -148,7 +145,7 @@ MakeMotion.propTypes = {
   motionTypes: PropTypes.arrayOf(PropTypes.object),
   members: PropTypes.arrayOf(PropTypes.object),
   config: PropTypes.object,
-  currentMotion: PropTypes.object,
+  currentMotion: PropTypes.any,
   setError: PropTypes.func
 };
 

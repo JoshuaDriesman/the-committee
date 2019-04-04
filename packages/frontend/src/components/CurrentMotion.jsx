@@ -15,10 +15,55 @@ const CurrentMotion = props => {
     margin-right: 15px !important;
   `;
 
+  const StyledVoteInProgress = styled.div`
+    display: flex;
+    flex-direction: row;
+  `;
+
+  const StyledVotingCounts = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  `;
+
+  const StyledCount = styled.div`
+    margin-bottom: 10px;
+  `;
+
   const handleWithdraw = async () => {
     const req = buildRequest(
       props.config.apiRoot + `/motion/${props.motion._id}/withdraw`,
       'PATCH',
+      { meetingId: sessionStorage.getItem('meetingId') },
+      sessionStorage.getItem('auth')
+    );
+
+    const res = await fetch(req);
+
+    if (res.status !== 200) {
+      props.setError(await res.text());
+    }
+  };
+
+  const handleVote = async () => {
+    const req = buildRequest(
+      props.config.apiRoot + `/voting/begin`,
+      'POST',
+      { meetingId: sessionStorage.getItem('meetingId') },
+      sessionStorage.getItem('auth')
+    );
+
+    const res = await fetch(req);
+
+    if (res.status !== 200) {
+      props.setError(await res.text());
+    }
+  };
+
+  const handleEndVote = async () => {
+    const req = buildRequest(
+      props.config.apiRoot + `/voting/end`,
+      'POST',
       { meetingId: sessionStorage.getItem('meetingId') },
       sessionStorage.getItem('auth')
     );
@@ -42,19 +87,56 @@ const CurrentMotion = props => {
           ? props.motion.secondedBy.lastName
           : 'N/A'}
       </p>
-      {!props.votingRecord && (
-        <StyledButtonSection>
-          <StyledButton onClick={handleWithdraw}>Withdraw</StyledButton>
-          <StyledButton>Vote</StyledButton>
-        </StyledButtonSection>
-      )}
+      {props.motion &&
+        (!props.votingRecord ? (
+          <StyledButtonSection>
+            <StyledButton onClick={handleWithdraw}>Withdraw</StyledButton>
+            <StyledButton onClick={handleVote}>Vote</StyledButton>
+          </StyledButtonSection>
+        ) : (
+          <StyledVoteInProgress>
+            <StyledButton onClick={handleEndVote}>End Vote</StyledButton>
+            <StyledVotingCounts>
+              <StyledCount>
+                {'Yes: '}
+                {
+                  props.votingRecord.votes.filter(v => v.voteState === 'yes')
+                    .length
+                }
+              </StyledCount>
+              <StyledCount>
+                {'No: '}
+                {
+                  props.votingRecord.votes.filter(v => v.voteState === 'no')
+                    .length
+                }
+              </StyledCount>
+              <StyledCount>
+                {'Abstain: '}
+                {
+                  props.votingRecord.votes.filter(
+                    v => v.voteState === 'abstain'
+                  ).length
+                }
+              </StyledCount>
+              <StyledCount>
+                {'Pending: '}
+                {
+                  props.votingRecord.votes.filter(
+                    v => v.voteState === 'pending'
+                  ).length
+                }
+              </StyledCount>
+            </StyledVotingCounts>
+          </StyledVoteInProgress>
+        ))}
     </React.Fragment>
   );
 };
 
 CurrentMotion.propTypes = {
   votingRecord: PropTypes.object,
-  motion: PropTypes.object
+  motion: PropTypes.any
 };
 
 export default CurrentMotion;

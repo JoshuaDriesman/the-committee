@@ -149,6 +149,7 @@ class ChairMeeting extends React.Component {
                     this.state.meeting.pendingMotions[pendingMotionsLength - 1]
                   }
                   config={this.props.config}
+                  votingRecord={this.state.meeting.activeVotingRecord}
                   setError={this.setError}
                 />
               </StyledTopSection>
