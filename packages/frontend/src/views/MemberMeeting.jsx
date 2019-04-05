@@ -2,7 +2,7 @@ import React from 'react';
 
 import Header from '../components/Header';
 
-import { withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import styled from '@emotion/styled';
 
 import { buildRequest } from '../utils';
@@ -96,6 +96,10 @@ class MemberMeeting extends React.Component {
 
   render() {
     if (this.state.meeting) {
+      if (this.state.meeting.status === 'adjourned') {
+        return <Redirect to="/home" />;
+      }
+
       const pendingMotionsLength = this.state.meeting.pendingMotions.length;
       return (
         <div>
