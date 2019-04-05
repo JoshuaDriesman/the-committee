@@ -81,61 +81,69 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/api', (req: Request, res: Response) => {
   res.send(`Up and running as of ${new Date().toISOString()}`);
 });
 
-app.post('/user/register', register);
-app.post('/user/login', login);
-app.get('/user/:userId', isAuthenticated, getUser);
-app.get('/user/byEmail/:email', isAuthenticated, getUserByEmail);
-app.get('/user', isAuthenticated, getCurrentUser);
+app.post('/api/user/register', register);
+app.post('/api/user/login', login);
+app.get('/api/user/:userId', isAuthenticated, getUser);
+app.get('/api/user/byEmail/:email', isAuthenticated, getUserByEmail);
+app.get('/api/user', isAuthenticated, getCurrentUser);
 
-app.post('/roster', isAuthenticated, createRoster);
-app.delete('/roster/:rosterId', isAuthenticated, deleteRoster);
+app.post('/api/roster', isAuthenticated, createRoster);
+app.delete('/api/roster/:rosterId', isAuthenticated, deleteRoster);
 app.put(
-  '/roster/:rosterId/addMemberByEmail/:memberEmail',
+  '/api/roster/:rosterId/addMemberByEmail/:memberEmail',
   isAuthenticated,
   addMemberByEmail
 );
 app.delete(
-  '/roster/:rosterId/removeMemberByEmail/:memberEmail',
+  '/api/roster/:rosterId/removeMemberByEmail/:memberEmail',
   isAuthenticated,
   removeMemberByEmail
 );
-app.get('/roster/:rosterId', isAuthenticated, getRoster);
+app.get('/api/roster/:rosterId', isAuthenticated, getRoster);
 
-app.get('/motionType', isAuthenticated, getMotionTypeForUser);
+app.get('/api/motionType', isAuthenticated, getMotionTypeForUser);
 
 app.post(
-  '/motionSet/createDefault',
+  '/api/motionSet/createDefault',
   isAuthenticated,
   generateDefaultMotionTypes
 );
-app.get('/motionSet/:motionSetId', isAuthenticated, getMotionSet);
+app.get('/api/motionSet/:motionSetId', isAuthenticated, getMotionSet);
 
 // General meeting endpoints
-app.post('/meeting/start', isAuthenticated, startMeeting);
-app.get('/meeting/:meetingId', isAuthenticated, getMeeting);
+app.post('/api/meeting/start', isAuthenticated, startMeeting);
+app.get('/api/meeting/:meetingId', isAuthenticated, getMeeting);
 
 // Chair meeting endpoints
-app.patch('/meeting/:meetingId/chair/adjourn', isAuthenticated, adjournMeeting);
+app.patch(
+  '/api/meeting/:meetingId/chair/adjourn',
+  isAuthenticated,
+  adjournMeeting
+);
 
 // Participant meeting endpoints
-app.get('/meetingByMember', isAuthenticated, getMeetingsByMember);
-app.patch('/meeting/:meetingId/participant/join', isAuthenticated, joinMeeting);
+app.get('/api/meetingByMember', isAuthenticated, getMeetingsByMember);
 app.patch(
-  '/meeting/:meetingId/participant/leave',
+  '/api/meeting/:meetingId/participant/join',
+  isAuthenticated,
+  joinMeeting
+);
+app.patch(
+  '/api/meeting/:meetingId/participant/leave',
   isAuthenticated,
   leaveMeeting
 );
 
-app.post('/motion', isAuthenticated, makeMotion);
-app.get('/motion/:motionId', isAuthenticated, getMotion);
-app.patch('/motion/:motionId/withdraw', isAuthenticated, withdrawMotion);
+app.post('/api/motion', isAuthenticated, makeMotion);
+app.get('/api/motion/:motionId', isAuthenticated, getMotion);
+app.patch('/api/motion/:motionId/withdraw', isAuthenticated, withdrawMotion);
 
-app.post('/voting/begin', isAuthenticated, beginVotingProcedure);
-app.post('/voting/end', isAuthenticated, endVotingProcedure);
-app.patch('/voting/vote', isAuthenticated, setVoteState);
+app.post('/api/voting/begin', isAuthenticated, beginVotingProcedure);
+app.post('/api/voting/end', isAuthenticated, endVotingProcedure);
+app.patch('/api/voting/vote', isAuthenticated, setVoteState);
 
 export default app;
