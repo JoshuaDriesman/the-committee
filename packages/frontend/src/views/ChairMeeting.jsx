@@ -128,7 +128,7 @@ class ChairMeeting extends React.Component {
   };
 
   render() {
-    if (this.state.meeting) {
+    if (this.state.meeting && this.state.motionTypes) {
       const members = this.state.meeting.attendanceRecords
         .filter(ar => ar.status === 'present')
         .map(ar => ar.member);

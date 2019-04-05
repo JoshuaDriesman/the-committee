@@ -39,28 +39,6 @@ class MemberMeeting extends React.Component {
 
   componentDidMount() {
     if (!this.state.meeting) {
-      const getMotionTypes = async () => {
-        if (!this.state.motionTypes) {
-          const req = buildRequest(
-            this.props.config.apiRoot +
-              `/motionSet/${this.state.meeting.motionSet._id}`,
-            'GET',
-            undefined,
-            sessionStorage.getItem('auth')
-          );
-
-          const res = await fetch(req);
-
-          if (res.status !== 200) {
-            console.error(
-              `Could not get motion types, status is ${res.status}`
-            );
-          } else {
-            this.setState({ motionTypes: (await res.json()).motionTypes });
-          }
-        }
-      };
-
       const getMeetingData = async () => {
         const meetingId = sessionStorage.getItem('meetingId');
         if (!meetingId) {
@@ -85,8 +63,6 @@ class MemberMeeting extends React.Component {
         } else {
           console.error(`Meeting request returned with ${response.status}`);
         }
-
-        getMotionTypes();
       };
 
       getMeetingData();

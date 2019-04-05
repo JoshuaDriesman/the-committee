@@ -7,7 +7,7 @@ import ChairMeeting from './views/ChairMeeting';
 import './App.css';
 import MemberMeeting from './views/MemberMeeting';
 
-const apiRoot = 'http://localhost:8080';
+const apiRoot = 'http://localhost:8080/api';
 const mode = 'DEV';
 
 const config = {
