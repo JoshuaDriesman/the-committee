@@ -73,7 +73,6 @@ const Home = props => {
       const meetingData = await res.json();
       sessionStorage.setItem('meetingId', meetingData._id);
       props.history.push('/chairMeeting');
-      props.history.goForward();
     }
   };
 
@@ -94,13 +93,12 @@ const Home = props => {
       const meetingData = await res.json();
       sessionStorage.setItem('meetingId', meetingData._id);
       props.history.push('/memberMeeting');
-      props.history.goForward();
     }
   };
 
   const onLogout = () => {
     sessionStorage.clear();
-    props.history.replace('/login');
+    props.history.push('/login');
   };
 
   return (

@@ -89,7 +89,6 @@ class MemberMeeting extends React.Component {
     if (res.status === 200) {
       sessionStorage.removeItem('meetingId');
       this.props.history.push('/home');
-      this.props.history.goForward();
     } else {
       console.error(`Leaving failed with code ${res.status}`);
     }

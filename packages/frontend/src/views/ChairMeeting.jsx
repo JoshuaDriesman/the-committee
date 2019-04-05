@@ -121,7 +121,6 @@ class ChairMeeting extends React.Component {
     if (res.status === 200) {
       sessionStorage.removeItem('meetingId');
       this.props.history.push('/home');
-      this.props.history.goForward();
     } else {
       console.error(`Adjourn failed with code ${res.status}`);
     }

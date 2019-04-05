@@ -15,30 +15,46 @@ const config = {
   mode
 };
 
-const authToken = sessionStorage.getItem('auth');
+const getAuthToken = () => {
+  return sessionStorage.getItem('auth');
+};
 
 const App = () => (
   <Router>
     <Route
       path="/login"
-      render={props => <Login {...props} config={config} />}
+      render={props =>
+        getAuthToken() ? (
+          <Redirect to="/home" />
+        ) : (
+          <Login {...props} config={config} />
+        )
+      }
     />
     <Route
       path="/home"
       render={props =>
-        authToken ? <Home config={config} /> : <Redirect to="/login" />
+        getAuthToken() ? <Home config={config} /> : <Redirect to="/login" />
       }
     />
     <Route
       path="/chairMeeting"
       render={props =>
-        authToken ? <ChairMeeting config={config} /> : <Redirect to="/login" />
+        getAuthToken() ? (
+          <ChairMeeting config={config} />
+        ) : (
+          <Redirect to="/login" />
+        )
       }
     />
     <Route
       path="/memberMeeting"
       render={props =>
-        authToken ? <MemberMeeting config={config} /> : <Redirect to="/login" />
+        getAuthToken() ? (
+          <MemberMeeting config={config} />
+        ) : (
+          <Redirect to="/login" />
+        )
       }
     />
   </Router>

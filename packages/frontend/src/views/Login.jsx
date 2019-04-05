@@ -52,7 +52,6 @@ const Login = props => {
       case 200:
         sessionStorage.setItem('auth', await result.text());
         props.history.push('/home');
-        props.history.goForward();
         break;
       case 400:
         setError('Email and password are both required.');
